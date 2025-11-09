@@ -1,19 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sametová šifra — úvod</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sametová revoluce - Escape Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Sametová šifra</h1>
-    <p>Vítej v digitální escape game na téma Sametové revoluce.</p>
-    <p>Hra obsahuje <strong>20 úkolů</strong>. Každý úkol najdeš pomocí QR kódu rozmístěného po škole.</p>
-    <p class="note">Do každého úkolu vlož text zadání. Odpověď musí být přesná (bez diakritiky, nebo dle nastavení) — defaultní odpovědi jsou pracovní a uprav je podle potřeby.</p>
-    <a href="ukol1.html"><button>Začít hru — Úkol 1</button></a>
-    <div class="footer">Pořízení hry: připraveno pro Netlify / GitHub. Edituj soubory: ukol1.html … ukol20.html, finale.html</div>
-  </div>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1>🕊️ SAMETOVÁ REVOLUCE</h1>
+                <p class="subtitle">17. listopad 1989</p>
+                <div class="divider"></div>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="story">
+                <h2>📜 Příběh</h2>
+                <p>Je 17. listopad 1989. Československo se probouzí z dlouhého spánku totality. Studenti vyšli do ulic, zvonící klíče symbolizují konec staré éry. Celý národ volá po svobodě.</p>
+                <p>Vaším úkolem je projít kritickými okamžiky Sametové revoluce a odhalit <strong>tajné heslo</strong>, které symbolizuje tento historický zlom.</p>
+            </section>
+
+            <section class="rules">
+                <h2>⚡ Pravidla hry</h2>
+                <div class="rules-grid">
+                    <div class="rule-card">
+                        <div class="rule-number">1</div>
+                        <h3>Skenuj QR kódy</h3>
+                        <p>Po škole jsou rozmístěny QR kódy. Naskenuj je a otevři úkoly.</p>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">2</div>
+                        <h3>Řeš úkoly</h3>
+                        <p>Každý úkol ti dá 2 znaky do finálního hesla. Celkem je 12 úkolů.</p>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">3</div>
+                        <h3>Libovolné pořadí</h3>
+                        <p>Můžeš chodit v jakémkoliv pořadí. Po správné odpovědi dostaneš nápovědu na další QR kód.</p>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">4</div>
+                        <h3>Finální heslo</h3>
+                        <p>Když splníš všech 12 úkolů, složíš tajné heslo a řekneš ho organizátorovi.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="info-box">
+                <h3>⏱️ Časový limit</h3>
+                <p>Máš <strong>90 minut</strong> na splnění všech úkolů.</p>
+                <p class="hint">💡 Tip: Zapisuj si získané znaky postupně!</p>
+            </section>
+
+            <div class="start-section">
+                <button class="btn-start" onclick="startGame()">
+                    🚀 ZAČÍT HRU
+                </button>
+                <p class="start-note">Po kliknutí se spustí časomíra</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>✊ Pravda a láska musí zvítězit nad lží a nenávistí</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
