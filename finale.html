@@ -1,22 +1,266 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Finále — Sametová šifra</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finále - Sametová revoluce</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .finale-header {
+            background: linear-gradient(135deg, var(--velvet-red), #a00000);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid var(--gold);
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+        
+        .finale-header h1 {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px var(--shadow);
+        }
+        
+        .finale-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid var(--gold);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--white);
+        }
+        
+        .chars-collected {
+            background: rgba(44, 24, 16, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--gold);
+            margin-bottom: 30px;
+        }
+        
+        .chars-collected h2 {
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+        
+        .chars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .char-box {
+            background: rgba(139, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--gold);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .char-box:hover {
+            transform: scale(1.05);
+        }
+        
+        .task-num {
+            font-size: 0.85rem;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        
+        .chars-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--white);
+            letter-spacing: 2px;
+            font-family: monospace;
+        }
+        
+        .final-password {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(139, 0, 0, 0.2));
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid var(--gold);
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        
+        .final-password h2 {
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .password-instruction {
+            font-size: 1.2rem;
+            color: var(--cream);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .password-box {
+            background: rgba(44, 24, 16, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--gold);
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        
+        .assembled-password {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold);
+            letter-spacing: 5px;
+            font-family: monospace;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .victory-message {
+            background: rgba(34, 139, 34, 0.2);
+            border: 3px solid #22BB22;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .victory-message h3 {
+            color: #22BB22;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .victory-message p {
+            font-size: 1.1rem;
+            color: var(--cream);
+            line-height: 1.8;
+        }
+        
+        .quote {
+            font-style: italic;
+            color: var(--gold);
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .confetti {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Finále</h2>
-    <p>Gratulujeme, došli jste až sem. Zadejte finální heslo, které získáte složením částí z jednotlivých úkolů.</p>
-    <input type="text" id="answer" placeholder="Zadejte finální heslo (přesně)">
-    <div style="margin-top:10px;">
-      <button onclick="checkAnswer('sametový koláček 1989', null)">Odeslat</button>
+    <div class="container">
+        <div class="finale-header">
+            <h1>🎊 FINÁLE</h1>
+            <p style="font-size: 1.2rem; color: var(--cream);">Gratulujeme! Splnil jsi všech 12 úkolů!</p>
+            
+            <div class="finale-stats">
+                <div class="stat-box">
+                    <div class="stat-label">⏱️ Tvůj čas</div>
+                    <div class="stat-value" id="finalTime">00:00:00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">✅ Splněno</div>
+                    <div class="stat-value">12/12</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chars-collected">
+            <h2>🔤 Sebrané znaky</h2>
+            <p style="text-align: center; color: var(--cream); margin-bottom: 20px;">
+                Zde jsou všechny znaky, které jsi získal během hry:
+            </p>
+            <div id="collectedChars"></div>
+        </div>
+
+        <div class="final-password">
+            <h2>🔐 FINÁLNÍ HESLO</h2>
+            <p class="password-instruction">
+                Poskládej znaky v pořadí úkolů (1→2→3...→12) a vytvoř tajné heslo.<br>
+                Heslo pak <strong>řekni organizátorovi</strong> pro dokončení hry!
+            </p>
+            
+            <div class="password-box">
+                <div class="assembled-password" id="assembledPassword">
+                    <!-- Zde se zobrazí poskládané heslo -->
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 0.95rem; color: var(--gold);">
+                💡 Tip: Zkontroluj, zda máš správně všechny znaky, a pak jdi za organizátorem!
+            </p>
+        </div>
+
+        <div class="victory-message">
+            <div class="confetti">🎉 🎊 🏆 🎉 🎊</div>
+            <h3>Výborně! Prošel jsi celou hrou!</h3>
+            <p>
+                Dokázal jsi projít klíčovými momenty Sametové revoluce a odhalit tajné heslo.<br>
+                Tvá cesta k svobodě byla úspěšná!
+            </p>
+            <p class="quote">
+                "Pravda a láska musí zvítězit nad lží a nenávistí."<br>
+                – Václav Havel
+            </p>
+            <div class="confetti">🕊️ ✊ 🔑 ✊ 🕊️</div>
+        </div>
     </div>
-    <p id="feedback"></p>
-    <div class="footer">Přednastavené finální heslo: <strong>sametový koláček 1989</strong></div>
-  </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Zobrazení finálního času
+        document.getElementById('finalTime').textContent = getElapsedTime();
+        
+        // Zobrazení sebraných znaků
+        displayCollectedChars();
+        
+        // Poskládání finálního hesla
+        function assemblePassword() {
+            const collectedChars = JSON.parse(localStorage.getItem('collectedChars') || '{}');
+            let password = '';
+            
+            for (let i = 1; i <= 12; i++) {
+                password += collectedChars[i] || '__';
+            }
+            
+            document.getElementById('assembledPassword').textContent = password;
+        }
+        
+        assemblePassword();
+        
+        // Kontrola, zda byly opravdu splněny všechny úkoly
+        const completedCount = getCompletedTasksCount();
+        if (completedCount < 12) {
+            alert(`⚠️ Pozor! Zatím jsi splnil pouze ${completedCount}/12 úkolů. Vrať se a dokonči zbývající úkoly!`);
+        }
+    </script>
 </body>
 </html>
