@@ -1,0 +1,12 @@
+# mac / windows / ide
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# node / build
+node_modules/
+dist/
+build/
+.env
+*.log
