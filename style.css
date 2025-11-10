@@ -7,7 +7,7 @@
 }
 
 :root {
-    --velvet-red: #001f3f;      /* Tmavě modrá (místo červené) */
+    --velvet-blue: #001f3f;      /* Tmavě modrá (místo červené) */
     --velvet-dark: #000814;     /* Téměř černá */
     --gold: #4A90E2;            /* Světle modrá (místo zlaté) */
     --cream: #E8F4F8;           /* Světlá modro-bílá (text) */
@@ -174,7 +174,7 @@ h2 {
 }
 
 .btn-start {
-    background: linear-gradient(135deg, var(--velvet-red), #a00000);
+    background: var(--velvet blue), #a00000);
     color: var(--white);
     font-size: 1.5rem;
     padding: 20px 50px;
