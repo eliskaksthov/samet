@@ -7,12 +7,13 @@
 }
 
 :root {
-    --blue: #004f9e;
-    --black: #000000;
-    --gold: #D4AF37;
-    --cream: #F5F5DC;
-    --white: #FFFFFF;
-    --shadow: rgba(0, 0, 0, 0.3);
+    --velvet-red: #001f3f;      /* Tmavě modrá (místo červené) */
+    --velvet-dark: #000814;     /* Téměř černá */
+    --gold: #4A90E2;            /* Světle modrá (místo zlaté) */
+    --cream: #E8F4F8;           /* Světlá modro-bílá (text) */
+    --white: #FFFFFF;           /* Bílá (zůstává) */
+    --shadow: rgba(0, 0, 0, 0.5); /* Tmavší stín */
+}
 }
 
 body {
