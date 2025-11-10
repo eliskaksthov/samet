@@ -16,7 +16,7 @@
 }
 
 body {
-    font-family: 'Georgia', serif;
+    font-family: ac compacta;
     background: linear-gradient(135deg, var(--velvet-dark) 0%, #1a1a1a 100%);
     color: var(--cream);
     min-height: 100vh;
