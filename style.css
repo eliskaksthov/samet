@@ -1,4 +1,5 @@
-/* Sametová revoluce - Vizuální styl */
+/* Sametová revoluce - Čistý modro-černý vizuální styl */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Open+Sans:wght@400;600;700&display=swap');
 
 * {
     margin: 0;
@@ -7,19 +8,16 @@
 }
 
 :root {
-    --velvet-blue: #001f3f;      /* Tmavě modrá (místo červené) */
-    --velvet-dark: #000814;     /* Téměř černá */
-    --gold: #4A90E2;            /* Světle modrá (místo zlaté) */
-    --cream: #E8F4F8;           /* Světlá modro-bílá (text) */
-    --white: #FFFFFF;           /* Bílá (zůstává) */
-    --shadow: rgba(0, 0, 0, 0.5); /* Tmavší stín */
-}
+    --red: #d70c0f;
+    --blue: #004f9e;
+    --white: #ffffff;
+    --black: #000000;
 }
 
 body {
-    font-family: ac compacta;
-    background: linear-gradient(135deg, var(--velvet-dark) 0%, #1a1a1a 100%);
-    color: var(--cream);
+    font-family: 'Open Sans', sans-serif;
+    background: var(--black);
+    color: var(--white);
     min-height: 100vh;
     line-height: 1.6;
 }
@@ -34,22 +32,23 @@ body {
 .hero {
     text-align: center;
     padding: 60px 20px 40px;
-    background: linear-gradient(to bottom, rgba(139, 0, 0, 0.3), transparent);
+    background: var(--blue);
     border-radius: 10px;
     margin-bottom: 40px;
 }
 
 .hero-content h1 {
-    font-size: 3rem;
-    color: var(--gold);
-    text-shadow: 2px 2px 4px var(--shadow);
+    font-family: 'Anton', sans-serif;
+    font-size: 3.5rem;
+    color: var(--white);
     margin-bottom: 10px;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
 }
 
 .subtitle {
     font-size: 1.5rem;
-    color: var(--cream);
+    color: var(--white);
     font-style: italic;
     margin-bottom: 20px;
 }
@@ -57,18 +56,16 @@ body {
 .divider {
     width: 200px;
     height: 3px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    background: var(--white);
     margin: 20px auto;
 }
 
 /* Content sections */
 .content {
-    background: rgba(44, 24, 16, 0.6);
+    background: var(--blue);
     padding: 40px;
     border-radius: 15px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(212, 175, 55, 0.3);
-    box-shadow: 0 10px 30px var(--shadow);
+    border: 3px solid var(--white);
 }
 
 .story, .rules {
@@ -76,22 +73,27 @@ body {
 }
 
 h2 {
-    color: var(--gold);
-    font-size: 2rem;
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
+    font-size: 2.2rem;
     margin-bottom: 20px;
     text-align: center;
-    border-bottom: 2px solid var(--gold);
+    border-bottom: 3px solid var(--white);
     padding-bottom: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .story p {
     font-size: 1.1rem;
     margin-bottom: 15px;
     text-align: justify;
+    color: var(--white);
 }
 
 .story strong {
-    color: var(--gold);
+    color: var(--white);
+    font-weight: 700;
 }
 
 /* Rules Grid */
@@ -103,24 +105,23 @@ h2 {
 }
 
 .rule-card {
-    background: rgba(139, 0, 0, 0.2);
+    background: var(--black);
     padding: 25px;
     border-radius: 10px;
-    border: 2px solid var(--gold);
+    border: 2px solid var(--white);
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s;
 }
 
 .rule-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
 }
 
 .rule-number {
     width: 50px;
     height: 50px;
-    background: var(--gold);
-    color: var(--velvet-dark);
+    background: var(--white);
+    color: var(--blue);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -131,20 +132,22 @@ h2 {
 }
 
 .rule-card h3 {
-    color: var(--gold);
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
     font-size: 1.2rem;
     margin-bottom: 10px;
+    letter-spacing: 1px;
 }
 
 .rule-card p {
     font-size: 0.95rem;
-    color: var(--cream);
+    color: var(--white);
 }
 
 /* Info Box */
 .info-box {
-    background: rgba(212, 175, 55, 0.1);
-    border: 2px solid var()--gold;
+    background: var(--black);
+    border: 3px solid var(--white);
     border-radius: 10px;
     padding: 25px;
     margin: 30px 0;
@@ -152,19 +155,23 @@ h2 {
 }
 
 .info-box h3 {
-    color: var(--gold);
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
     font-size: 1.5rem;
     margin-bottom: 15px;
+    letter-spacing: 1px;
 }
 
 .info-box p {
     font-size: 1.1rem;
     margin-bottom: 10px;
+    color: var(--white);
 }
 
 .hint {
     font-style: italic;
-    color: var(--gold);
+    color: var(--white);
+    font-weight: 600;
 }
 
 /* Start Button */
@@ -174,24 +181,23 @@ h2 {
 }
 
 .btn-start {
-    background: var(--velvet-blue:), #a00000);
+    background: var(--red);
     color: var(--white);
+    font-family: 'Anton', sans-serif;
     font-size: 1.5rem;
     padding: 20px 50px;
-    border: 3px solid var(--gold);
-    border-radius: 50px;
+    border: 3px solid var(--white);
+    border-radius: 10px;
     cursor: pointer;
-    font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     transition: all 0.3s;
-    box-shadow: 0 5px 20px var(--shadow);
-    font-family: 'Georgia', serif;
+    text-transform: uppercase;
 }
 
 .btn-start:hover {
-    background: linear-gradient(135deg, #a00000, var(--velvet-red));
+    background: var(--white);
+    color: var(--red);
     transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
 }
 
 .btn-start:active {
@@ -201,7 +207,7 @@ h2 {
 .start-note {
     margin-top: 15px;
     font-size: 0.9rem;
-    color: var(--gold);
+    color: var(--white);
     font-style: italic;
 }
 
@@ -210,7 +216,7 @@ footer {
     text-align: center;
     margin-top: 40px;
     padding: 20px;
-    color: var(--gold);
+    color: var(--white);
     font-style: italic;
     font-size: 1.1rem;
 }
@@ -218,7 +224,7 @@ footer {
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-content h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
     
     .subtitle {
@@ -254,5 +260,340 @@ footer {
 .hero, .content {
     animation: fadeIn 0.8s ease-out;
 }
-.footer { font-size: 13px; opacity: 0.85; margin-top: 18px; }
-.note { font-size: 14px; opacity: 0.9; margin-top: 8px; }
+
+/* Styly pro stránky úkolů */
+.task-header {
+    background: var(--blue);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    border: 3px solid var(--white);
+}
+
+.task-header h1 {
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.task-info {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.info-item {
+    background: var(--black);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid var(--white);
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: var(--white);
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--white);
+}
+
+.task-content {
+    background: var(--blue);
+    padding: 30px;
+    border-radius: 15px;
+    border: 3px solid var(--white);
+    margin-bottom: 30px;
+}
+
+.task-question {
+    background: var(--black);
+    padding: 25px;
+    border-radius: 10px;
+    border: 2px solid var(--white);
+    margin: 20px 0;
+}
+
+.task-question h3 {
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+}
+
+.task-question p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--white);
+}
+
+.answer-section {
+    background: var(--black);
+    padding: 25px;
+    border-radius: 10px;
+    border: 2px solid var(--white);
+}
+
+.answer-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    border: 2px solid var(--white);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--black);
+    margin: 15px 0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.answer-input:focus {
+    outline: none;
+    border: 2px solid var(--blue);
+}
+
+.btn-submit {
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Anton', sans-serif;
+    font-size: 1.2rem;
+    padding: 15px 40px;
+    border: 2px solid var(--white);
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+.btn-submit:hover {
+    background: var(--white);
+    color: var(--red);
+    transform: translateY(-2px);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.feedback {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+}
+
+.feedback.success {
+    display: block;
+    background: var(--blue);
+    border: 2px solid var(--white);
+    color: var(--white);
+}
+
+.feedback.error {
+    display: block;
+    background: var(--red);
+    border: 2px solid var(--white);
+    color: var(--white);
+}
+
+.chars {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--white);
+    letter-spacing: 3px;
+}
+
+.hint-box {
+    background: var(--blue);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border: 2px solid var(--white);
+}
+
+/* Styly pro finále */
+.finale-header {
+    background: var(--blue);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    border: 3px solid var(--white);
+    margin-bottom: 40px;
+}
+
+.finale-header h1 {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.5rem;
+    color: var(--white);
+    margin-bottom: 15px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.finale-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.stat-box {
+    background: var(--black);
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2px solid var(--white);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--white);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--white);
+}
+
+.chars-collected {
+    background: var(--blue);
+    padding: 30px;
+    border-radius: 15px;
+    border: 3px solid var(--white);
+    margin-bottom: 30px;
+}
+
+.chars-collected h2 {
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.chars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.char-box {
+    background: var(--black);
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid var(--white);
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.char-box:hover {
+    transform: scale(1.05);
+}
+
+.task-num {
+    font-size: 0.85rem;
+    color: var(--white);
+    margin-bottom: 8px;
+}
+
+.chars-display {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--white);
+    letter-spacing: 2px;
+    font-family: monospace;
+}
+
+.final-password {
+    background: var(--black);
+    padding: 30px;
+    border-radius: 15px;
+    border: 3px solid var(--white);
+    text-align: center;
+    margin-top: 30px;
+}
+
+.final-password h2 {
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
+    font-size: 2rem;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.password-instruction {
+    font-size: 1.2rem;
+    color: var(--white);
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+.password-box {
+    background: var(--blue);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--white);
+    margin: 20px auto;
+    max-width: 500px;
+}
+
+.assembled-password {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--white);
+    letter-spacing: 5px;
+    font-family: monospace;
+    text-align: center;
+    padding: 15px;
+}
+
+.victory-message {
+    background: var(--blue);
+    border: 3px solid var(--white);
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.victory-message h3 {
+    font-family: 'Anton', sans-serif;
+    color: var(--white);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+.victory-message p {
+    font-size: 1.1rem;
+    color: var(--white);
+    line-height: 1.8;
+}
+
+.quote {
+    font-style: italic;
+    color: var(--white);
+    margin-top: 20px;
+    font-size: 1.2rem;
+}
+
+.confetti {
+    font-size: 2rem;
+    margin: 10px 0;
+}
