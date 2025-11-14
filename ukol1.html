@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle hra</title>
+    <title>Obrázkové puzzle</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,41 +62,52 @@
         
         #puzzle-board {
             display: grid;
-            gap: 3px;
-            background: #ddd;
-            padding: 3px;
+            gap: 2px;
+            background: #333;
+            padding: 2px;
             border-radius: 10px;
             margin: 0 auto;
+            position: relative;
         }
         
         .puzzle-piece {
             aspect-ratio: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 5px;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
             cursor: pointer;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-size: 400% 400%;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
         }
         
-        .puzzle-piece:hover {
+        .puzzle-piece:hover:not(.empty) {
             transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10;
         }
         
         .puzzle-piece.empty {
-            background: #f0f0f0;
+            background: #f0f0f0 !important;
             cursor: default;
         }
         
         .puzzle-piece.empty:hover {
             transform: none;
             box-shadow: none;
+        }
+        
+        .puzzle-piece.show-numbers::after {
+            content: attr(data-number);
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
         }
         
         .win-message {
@@ -120,20 +131,59 @@
             border: 2px solid #667eea;
             margin: 5px;
         }
+        
+        .image-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .image-option {
+            width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            object-fit: cover;
+        }
+        
+        .image-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .image-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+        
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧩 Puzzle hra</h1>
+        <h1>🖼️ Obrázkové puzzle</h1>
         
         <div class="controls">
-            <label for="size">Velikost:</label>
-            <select id="size">
-                <option value="3">3x3 (Snadné)</option>
-                <option value="4" selected>4x4 (Střední)</option>
-                <option value="5">5x5 (Těžké)</option>
-            </select>
             <button class="btn" onclick="novaHra()">Nová hra</button>
+            <label>
+                <input type="checkbox" id="showNumbers" onchange="prepnoutCisla()">
+                Zobrazit čísla
+            </label>
         </div>
         
         <div class="info">
@@ -147,7 +197,9 @@
     </div>
 
     <script>
-        let velikost = 4;
+        const obrazek = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_Czech_Republic.svg/800px-Flag_of_the_Czech_Republic.svg.png';
+        
+        let velikost = 5;
         let deska = [];
         let prazdnePole = { x: 0, y: 0 };
         let tahy = 0;
@@ -194,18 +246,36 @@
         function vykresliDesku() {
             let board = document.getElementById('puzzle-board');
             board.innerHTML = '';
-            board.style.gridTemplateColumns = `repeat(${velikost}, 80px)`;
-            board.style.gridTemplateRows = `repeat(${velikost}, 80px)`;
+            
+            let velikostDlazdice = 100;
+            board.style.gridTemplateColumns = `repeat(${velikost}, ${velikostDlazdice}px)`;
+            board.style.gridTemplateRows = `repeat(${velikost}, ${velikostDlazdice}px)`;
+            
+            let showNumbers = document.getElementById('showNumbers').checked;
             
             for (let y = 0; y < velikost; y++) {
                 for (let x = 0; x < velikost; x++) {
                     let piece = document.createElement('button');
                     piece.className = 'puzzle-piece';
                     
+                    if (showNumbers) {
+                        piece.classList.add('show-numbers');
+                    }
+                    
                     if (deska[y][x] === 0) {
-                        piece.className += ' empty';
+                        piece.classList.add('empty');
                     } else {
-                        piece.textContent = deska[y][x];
+                        let cislo = deska[y][x];
+                        let origX = (cislo - 1) % velikost;
+                        let origY = Math.floor((cislo - 1) / velikost);
+                        
+                        let posX = -origX * 100;
+                        let posY = -origY * 100;
+                        
+                        piece.style.backgroundImage = `url(${obrazek})`;
+                        piece.style.backgroundPosition = `${posX}% ${posY}%`;
+                        piece.setAttribute('data-number', cislo);
+                        
                         piece.onclick = () => posunDlazdici(x, y);
                     }
                     
@@ -273,8 +343,11 @@
             }, 1000);
         }
 
+        function prepnoutCisla() {
+            vykresliDesku();
+        }
+
         function novaHra() {
-            velikost = parseInt(document.getElementById('size').value);
             tahy = 0;
             hraSkoncila = false;
             
@@ -286,8 +359,6 @@
             vykresliDesku();
             spustCasovac();
         }
-
-        document.getElementById('size').addEventListener('change', novaHra);
         
         novaHra();
     </script>
