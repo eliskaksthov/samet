@@ -3,213 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Úkol 1 - Sametová revoluce</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Puzzle hra</title>
     <style>
-        /* Styly specifické pro stránky úkolů */
-        .task-header {
-            background: linear-gradient(135deg, var(--velvet-red), #6b0000);
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 2px solid var(--gold);
         }
         
-        .task-info {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 20px;
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .controls {
+            text-align: center;
             margin-bottom: 20px;
         }
         
-        .info-item {
-            background: rgba(212, 175, 55, 0.2);
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--gold);
-        }
-        
-        .info-label {
-            font-size: 0.9rem;
-            color: var(--gold);
-            margin-bottom: 5px;
-        }
-        
-        .info-value {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--white);
-        }
-        
-        .task-content {
-            background: rgba(44, 24, 16, 0.6);
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            margin-bottom: 30px;
-        }
-        
-        .task-question {
-            background: rgba(139, 0, 0, 0.2);
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 5px solid var(--gold);
-            margin: 20px 0;
-        }
-        
-        .task-question h3 {
-            color: var(--gold);
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-        
-        .task-question p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-        }
-        
-        .answer-section {
-            background: rgba(212, 175, 55, 0.1);
-            padding: 25px;
-            border-radius: 10px;
-            border: 2px solid var(--gold);
-        }
-        
-        .answer-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.1rem;
-            border: 2px solid var(--gold);
-            border-radius: 8px;
-            background: rgba(44, 24, 16, 0.8);
-            color: var(--cream);
-            margin: 15px 0;
-            font-family: 'Georgia', serif;
-        }
-        
-        .answer-input:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-        
-        .btn-submit {
-            background: linear-gradient(135deg, var(--gold), #b8941f);
-            color: var(--velvet-dark);
-            font-size: 1.2rem;
-            padding: 15px 40px;
+        .btn {
+            background: #667eea;
+            color: white;
             border: none;
+            padding: 12px 24px;
+            font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            margin: 5px;
             transition: all 0.3s;
-            font-family: 'Georgia', serif;
-            width: 100%;
         }
         
-        .btn-submit:hover {
+        .btn:hover {
+            background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.6);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
         
-        .btn-submit:active {
-            transform: translateY(0);
+        .info {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #555;
         }
         
-        .feedback {
-            margin-top: 20px;
-            padding: 20px;
+        #puzzle-board {
+            display: grid;
+            gap: 3px;
+            background: #ddd;
+            padding: 3px;
             border-radius: 10px;
-            display: none;
+            margin: 0 auto;
         }
         
-        .feedback.success {
-            display: block;
-            background: rgba(34, 139, 34, 0.2);
-            border: 2px solid #22BB22;
-            color: #AAFFAA;
-        }
-        
-        .feedback.error {
-            display: block;
-            background: rgba(139, 0, 0, 0.2);
-            border: 2px solid #CC0000;
-            color: #FFAAAA;
-        }
-        
-        .chars {
-            font-size: 1.5rem;
+        .puzzle-piece {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 5px;
+            font-size: 24px;
             font-weight: bold;
-            color: var(--gold);
-            letter-spacing: 3px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .hint-box {
-            background: rgba(212, 175, 55, 0.15);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid var(--gold);
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .puzzle-piece.empty {
+            background: #f0f0f0;
+            cursor: default;
+        }
+        
+        .puzzle-piece.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .win-message {
+            text-align: center;
+            font-size: 24px;
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: bounce 0.5s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid #667eea;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="task-header">
-            <h1>📋 ÚKOL 1</h1>
-            <div class="task-info">
-                <div class="info-item">
-                    <div class="info-label">⏱️ Čas</div>
-                    <div class="info-value" id="timer">00:00:00</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">✅ Splněno</div>
-                    <div class="info-value" id="progress">0/12</div>
-                </div>
-            </div>
+        <h1>🧩 Puzzle hra</h1>
+        
+        <div class="controls">
+            <label for="size">Velikost:</label>
+            <select id="size">
+                <option value="3">3x3 (Snadné)</option>
+                <option value="4" selected>4x4 (Střední)</option>
+                <option value="5">5x5 (Těžké)</option>
+            </select>
+            <button class="btn" onclick="novaHra()">Nová hra</button>
         </div>
-
-        <div class="task-content">
-            <div class="task-question">
-                <h3>❓ Zadání:</h3>
-                <p>
-                    <!-- SEM DOPLNÍTE ZADÁNÍ ÚKOLU -->
-                    Který československý prezident podepsal Chartu 77 a později se stal symbolem Sametové revoluce?
-                </p>
-            </div>
-
-            <div class="answer-section">
-                <label for="answer" style="color: var(--gold); font-size: 1.1rem; display: block; margin-bottom: 10px;">
-                    💭 Tvoje odpověď:
-                </label>
-                <input 
-                    type="text" 
-                    id="answer" 
-                    class="answer-input" 
-                    placeholder="Zadej odpověď..."
-                    onkeypress="if(event.key === 'Enter') submitAnswer()"
-                >
-                <button class="btn-submit" onclick="submitAnswer()">
-                    ✔️ ODESLAT ODPOVĚĎ
-                </button>
-                
-                <div id="feedback" class="feedback"></div>
-            </div>
+        
+        <div class="info">
+            <span>Tahy: <strong id="moves">0</strong></span>
+            <span style="margin-left: 20px;">Čas: <strong id="time">0</strong>s</span>
         </div>
+        
+        <div id="puzzle-board"></div>
+        
+        <div id="win-msg"></div>
     </div>
 
-    <script src="script.js"></script>
     <script>
-        // Konfigurace pro tento úkol
-        const TASK_NUMBER = 1;
-        const CORRECT_ANSWER = "václav havel"; // SEM DOPLNÍTE SPRÁVNOU ODPOVĚĎ (malými písmeny)
-        const CHARS = "SA"; // SEM DOPLNÍTE 2 ZNAKY, KTERÉ ÚKOL DÁ
-        const NEXT_HINT = "Hledej QR kód ve třídě dějepisu, poblíž mapy Československa."; // SEM DOPLNÍTE NÁPOVĚDU
-        
-        function submitAnswer() {
-            checkAnswer(TASK_NUMBER, CORRECT_ANSWER, CHARS, NEXT_HINT);
+        let velikost = 4;
+        let deska = [];
+        let prazdnePole = { x: 0, y: 0 };
+        let tahy = 0;
+        let cas = 0;
+        let casovac = null;
+        let hraSkoncila = false;
+
+        function inicializujDesku() {
+            deska = [];
+            let cislo = 1;
+            
+            for (let y = 0; y < velikost; y++) {
+                deska[y] = [];
+                for (let x = 0; x < velikost; x++) {
+                    if (y === velikost - 1 && x === velikost - 1) {
+                        deska[y][x] = 0;
+                        prazdnePole = { x, y };
+                    } else {
+                        deska[y][x] = cislo++;
+                    }
+                }
+            }
         }
+
+        function zamichejDesku() {
+            for (let i = 0; i < velikost * velikost * 10; i++) {
+                let moznePosuny = [];
+                
+                if (prazdnePole.y > 0) moznePosuny.push({ x: 0, y: -1 });
+                if (prazdnePole.y < velikost - 1) moznePosuny.push({ x: 0, y: 1 });
+                if (prazdnePole.x > 0) moznePosuny.push({ x: -1, y: 0 });
+                if (prazdnePole.x < velikost - 1) moznePosuny.push({ x: 1, y: 0 });
+                
+                let nahodnyPosun = moznePosuny[Math.floor(Math.random() * moznePosuny.length)];
+                let novyX = prazdnePole.x + nahodnyPosun.x;
+                let novyY = prazdnePole.y + nahodnyPosun.y;
+                
+                deska[prazdnePole.y][prazdnePole.x] = deska[novyY][novyX];
+                deska[novyY][novyX] = 0;
+                prazdnePole = { x: novyX, y: novyY };
+            }
+        }
+
+        function vykresliDesku() {
+            let board = document.getElementById('puzzle-board');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${velikost}, 80px)`;
+            board.style.gridTemplateRows = `repeat(${velikost}, 80px)`;
+            
+            for (let y = 0; y < velikost; y++) {
+                for (let x = 0; x < velikost; x++) {
+                    let piece = document.createElement('button');
+                    piece.className = 'puzzle-piece';
+                    
+                    if (deska[y][x] === 0) {
+                        piece.className += ' empty';
+                    } else {
+                        piece.textContent = deska[y][x];
+                        piece.onclick = () => posunDlazdici(x, y);
+                    }
+                    
+                    board.appendChild(piece);
+                }
+            }
+        }
+
+        function posunDlazdici(x, y) {
+            if (hraSkoncila) return;
+            
+            let dx = Math.abs(x - prazdnePole.x);
+            let dy = Math.abs(y - prazdnePole.y);
+            
+            if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                deska[prazdnePole.y][prazdnePole.x] = deska[y][x];
+                deska[y][x] = 0;
+                prazdnePole = { x, y };
+                
+                tahy++;
+                document.getElementById('moves').textContent = tahy;
+                
+                vykresliDesku();
+                
+                if (zkontrolujVyhru()) {
+                    vyhra();
+                }
+            }
+        }
+
+        function zkontrolujVyhru() {
+            let spravneCislo = 1;
+            
+            for (let y = 0; y < velikost; y++) {
+                for (let x = 0; x < velikost; x++) {
+                    if (y === velikost - 1 && x === velikost - 1) {
+                        return deska[y][x] === 0;
+                    }
+                    if (deska[y][x] !== spravneCislo++) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function vyhra() {
+            hraSkoncila = true;
+            clearInterval(casovac);
+            
+            let msg = document.getElementById('win-msg');
+            msg.className = 'win-message';
+            msg.textContent = `🎉 Gratulujeme! Vyřešili jste puzzle v ${tahy} tazích a za ${cas} sekund!`;
+        }
+
+        function spustCasovac() {
+            cas = 0;
+            document.getElementById('time').textContent = cas;
+            
+            if (casovac) clearInterval(casovac);
+            
+            casovac = setInterval(() => {
+                cas++;
+                document.getElementById('time').textContent = cas;
+            }, 1000);
+        }
+
+        function novaHra() {
+            velikost = parseInt(document.getElementById('size').value);
+            tahy = 0;
+            hraSkoncila = false;
+            
+            document.getElementById('moves').textContent = tahy;
+            document.getElementById('win-msg').textContent = '';
+            
+            inicializujDesku();
+            zamichejDesku();
+            vykresliDesku();
+            spustCasovac();
+        }
+
+        document.getElementById('size').addEventListener('change', novaHra);
+        
+        novaHra();
     </script>
 </body>
 </html>
