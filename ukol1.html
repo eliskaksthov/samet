@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
@@ -341,9 +341,11 @@
             
             if (timer) clearInterval(timer);
             
-            timer = setInterval(() => {
+            timer = setInterval(function() {
                 seconds++;
-                document.getElementById('timeDisplay').textContent = `${Math.floor(seconds / 60)}:${seconds % 60.toString().padStart(2, '0')}`;
+                var minutes = Math.floor(seconds / 60);
+                var remainingSeconds = seconds % 60;
+                document.getElementById('timeDisplay').textContent = minutes + ':' + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
             }, 1000);
         }
 
