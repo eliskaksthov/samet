@@ -3,386 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obrázkové puzzle</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Puzzle - Česká Vlajka</title>
     <style>
-        .puzzle-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .puzzle-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            width: 400px;
-            height: 400px;
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        
-        .puzzle-tile {
-            background: #004f9e;
-            color: white;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            user-select: none;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        
-        .puzzle-tile.empty {
-            background: transparent;
-            border: 2px dashed #004f9e;
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            width: 100%;
         }
-        
-        .puzzle-tile:not(.empty):hover {
-            background: #003366;
-            transform: scale(1.03);
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
         }
-        
-        .puzzle-controls {
-            margin: 20px 0;
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        
-        .btn {
-            background: #004f9e;
-            color: white;
-            border: none;
+
+        button {
             padding: 12px 24px;
             font-size: 16px;
+            border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin: 5px;
+            background: #667eea;
+            color: white;
             transition: all 0.3s;
-            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
         }
-        
-        .btn:hover {
+
+        button:hover {
             background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        
-        .btn:active {
-            transform: translateY(0);
+
+        .difficulty {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
-        
-        .btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
+
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            font-size: 16px;
+            cursor: pointer;
         }
-        
-        .moves, .timer {
-            font-size: 1.2rem;
-            margin: 15px 0;
-            color: white;
+
+        .game-area {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
         }
-        
-        .win-message {
+
+        .puzzle-board {
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #puzzleCanvas {
+            display: block;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .timer {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .completion-message {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 15px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 100;
             display: none;
-            border: 2px solid #004f9e;
+            z-index: 1000;
         }
-        
-        .win-message h2 {
-            color: #ffffff;
-            margin-top: 0;
-            font-family: 'Anton', sans-serif;
-            font-size: 2.5rem;
+
+        .completion-message.show {
+            display: block;
+            animation: slideIn 0.5s ease;
         }
-        
-        .win-message p {
-            margin: 15px 0 25px;
-            font-size: 1.2rem;
-            color: #ffffff;
-        }
-        
-        @media (max-width: 500px) {
-            .puzzle-board {
-                width: 300px;
-                height: 300px;
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
             }
-            
-            .puzzle-tile {
-                font-size: 18px;
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
             }
+        }
+
+        .completion-message h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="puzzle-container">
-        <h1 class="hero-content">🖼️ Obrázkové puzzle</h1>
+    <div class="container">
+        <h1>🧩 Puzzle - Česká Vlajka</h1>
         
-        <div class="puzzle-controls">
-            <button class="btn" onclick="novaHra()">Nová hra</button>
-            <button class="btn" id="hintBtn" disabled>Nápověda</button>
+        <div class="controls">
+            <div class="difficulty">
+                <label for="difficulty">Obtížnost:</label>
+                <select id="difficulty">
+                    <option value="3">Snadná (3×3)</option>
+                    <option value="4" selected>Střední (4×4)</option>
+                    <option value="5">Těžká (5×5)</option>
+                    <option value="6">Expert (6×6)</option>
+                </select>
+            </div>
+            <button onclick="game.newGame()">Nová hra</button>
+            <button onclick="game.shuffle()">Zamíchat</button>
         </div>
-        
-        <div class="puzzle-board" id="puzzleBoard">
-            <!-- Tiles will be generated by JavaScript -->
+
+        <div class="info">
+            <div>Tahy: <span id="moves" class="timer">0</span></div>
+            <div>Čas: <span id="time" class="timer">00:00</span></div>
         </div>
-        
-        <div class="moves">Tahy: <span id="moveCount">0</span></div>
-        <div class="timer">Čas: <span id="timeDisplay">0:00</span></div>
+
+        <div class="game-area">
+            <div class="puzzle-board">
+                <canvas id="puzzleCanvas"></canvas>
+            </div>
+        </div>
     </div>
-    
-    <div class="win-message" id="winMessage">
-        <h2>Gratuluji! 🎉</h2>
-        <p>Složil(a) jsi puzzle za <span id="finalMoves">0</span> tahů a <span id="finalTime">0:00</span>!</p>
-        <button class="btn" onclick="novaHra()">Hrát znovu</button>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="completion-message" id="completionMessage">
+        <h2>🎉 Gratulujeme!</h2>
+        <p>Dokončili jste puzzle!</p>
+        <p>Tahy: <span id="finalMoves"></span></p>
+        <p>Čas: <span id="finalTime"></span></p>
+        <button onclick="game.closeCompletion()">Zavřít</button>
+        <button onclick="game.newGame(); game.closeCompletion()">Nová hra</button>
     </div>
 
     <script>
-        const obrazek = 'https://edu.ceskatelevize.cz/storage/collection/header/400/anatomie-sametove-revoluce.png';
-        
-        const BOARD_SIZE = 4; // 4x4 grid
-        let board = [];
-        let emptyPos = { x: 3, y: 3 }; // Bottom right corner
-        let moveCount = 0;
-        let timer = null;
-        let seconds = 0;
-        let gameActive = false;
-        
-        // Image of the crowd for the puzzle
-        const puzzleImage = 'https://i.ibb.co/0qWbJQc/crowd-image.jpg';
-        
-        // Initialize the board
-        function inicializujDesku() {
-            board = [];
-            let cislo = 1;
-            
-            for (let y = 0; y < BOARD_SIZE; y++) {
-                board[y] = [];
-                for (let x = 0; x < BOARD_SIZE; x++) {
-                    if (y === BOARD_SIZE - 1 && x === BOARD_SIZE - 1) {
-                        board[y][x] = 0;
-                        emptyPos = { x, y };
-                    } else {
-                        board[y][x] = cislo++;
+        const game = {
+            canvas: null,
+            ctx: null,
+            image: null,
+            gridSize: 4,
+            tileSize: 0,
+            tiles: [],
+            emptyTile: null,
+            moves: 0,
+            startTime: null,
+            timerInterval: null,
+            canvasSize: 600,
+
+            init() {
+                this.canvas = document.getElementById('puzzleCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.loadImage();
+                
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
+                document.getElementById('difficulty').addEventListener('change', (e) => {
+                    this.gridSize = parseInt(e.target.value);
+                    this.newGame();
+                });
+            },
+
+            loadImage() {
+                this.image = new Image();
+                this.image.crossOrigin = "anonymous";
+                this.image.onload = () => {
+                    this.newGame();
+                };
+                // Nahraďte tuto URL base64 kódováním vašeho obrázku nebo použijte relativní cestu
+                this.image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+                // Pro GitHub/Vercel použijte: this.image.src = './image.jpg';
+            },
+
+            newGame() {
+                this.moves = 0;
+                this.updateMoves();
+                this.stopTimer();
+                this.startTime = Date.now();
+                this.startTimer();
+                
+                this.tileSize = this.canvasSize / this.gridSize;
+                this.canvas.width = this.canvasSize;
+                this.canvas.height = this.canvasSize;
+                
+                this.tiles = [];
+                for (let i = 0; i < this.gridSize * this.gridSize; i++) {
+                    this.tiles.push({
+                        id: i,
+                        currentPos: i,
+                        correctPos: i
+                    });
+                }
+                
+                this.emptyTile = this.tiles[this.tiles.length - 1];
+                this.shuffle();
+            },
+
+            shuffle() {
+                // Proveďte 1000 náhodných platných tahů
+                for (let i = 0; i < 1000; i++) {
+                    const neighbors = this.getNeighbors(this.emptyTile.currentPos);
+                    const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+                    this.swapTiles(this.emptyTile.currentPos, randomNeighbor);
+                }
+                this.moves = 0;
+                this.updateMoves();
+                this.draw();
+            },
+
+            getNeighbors(pos) {
+                const neighbors = [];
+                const row = Math.floor(pos / this.gridSize);
+                const col = pos % this.gridSize;
+
+                if (row > 0) neighbors.push(pos - this.gridSize); // nahoru
+                if (row < this.gridSize - 1) neighbors.push(pos + this.gridSize); // dolů
+                if (col > 0) neighbors.push(pos - 1); // vlevo
+                if (col < this.gridSize - 1) neighbors.push(pos + 1); // vpravo
+
+                return neighbors;
+            },
+
+            swapTiles(pos1, pos2) {
+                const tile1 = this.tiles.find(t => t.currentPos === pos1);
+                const tile2 = this.tiles.find(t => t.currentPos === pos2);
+                
+                [tile1.currentPos, tile2.currentPos] = [tile2.currentPos, tile1.currentPos];
+            },
+
+            handleClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const col = Math.floor(x / this.tileSize);
+                const row = Math.floor(y / this.tileSize);
+                const clickedPos = row * this.gridSize + col;
+                
+                const neighbors = this.getNeighbors(this.emptyTile.currentPos);
+                if (neighbors.includes(clickedPos)) {
+                    this.swapTiles(this.emptyTile.currentPos, clickedPos);
+                    this.moves++;
+                    this.updateMoves();
+                    this.draw();
+                    
+                    if (this.checkWin()) {
+                        this.stopTimer();
+                        setTimeout(() => this.showCompletion(), 500);
                     }
                 }
-            }
-        }
+            },
 
-        // Shuffle the board
-        function zamichejDesku() {
-            for (let i = 0; i < BOARD_SIZE * BOARD_SIZE * 10; i++) {
-                let moznePosuny = [];
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                if (emptyPos.y > 0) moznePosuny.push({ x: 0, y: -1 });
-                if (emptyPos.y < BOARD_SIZE - 1) moznePosuny.push({ x: 0, y: 1 });
-                if (emptyPos.x > 0) moznePosuny.push({ x: -1, y: 0 });
-                if (emptyPos.x < BOARD_SIZE - 1) moznePosuny.push({ x: 1, y: 0 });
-                
-                let nahodnyPosun = moznePosuny[Math.floor(Math.random() * moznePosuny.length)];
-                let novyX = emptyPos.x + nahodnyPosun.x;
-                let novyY = emptyPos.y + nahodnyPosun.y;
-                
-                board[emptyPos.y][emptyPos.x] = board[novyY][novyX];
-                board[novyY][novyX] = 0;
-                emptyPos = { x: novyX, y: novyY };
-            }
-        }
+                this.tiles.forEach(tile => {
+                    if (tile.id === this.gridSize * this.gridSize - 1) return; // Nevykreslujte prázdné pole
+                    
+                    const currentRow = Math.floor(tile.currentPos / this.gridSize);
+                    const currentCol = tile.currentPos % this.gridSize;
+                    const sourceRow = Math.floor(tile.id / this.gridSize);
+                    const sourceCol = tile.id % this.gridSize;
+                    
+                    const sx = (sourceCol * this.image.width) / this.gridSize;
+                    const sy = (sourceRow * this.image.height) / this.gridSize;
+                    const sw = this.image.width / this.gridSize;
+                    const sh = this.image.height / this.gridSize;
+                    
+                    const dx = currentCol * this.tileSize;
+                    const dy = currentRow * this.tileSize;
+                    
+                    this.ctx.drawImage(
+                        this.image,
+                        sx, sy, sw, sh,
+                        dx, dy, this.tileSize, this.tileSize
+                    );
+                    
+                    // Ohraničení dílků
+                    this.ctx.strokeStyle = '#ccc';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeRect(dx, dy, this.tileSize, this.tileSize);
+                });
+            },
 
-        // Draw the board
-        function vykresliDesku() {
-            const boardElement = document.getElementById('puzzleBoard');
-            boardElement.innerHTML = '';
-            
-            // Add the puzzle image as a background
-            const imgElement = document.createElement('img');
-            imgElement.src = puzzleImage;
-            imgElement.className = 'puzzle-image';
-            imgElement.alt = 'Puzzle image';
-            boardElement.appendChild(imgElement);
-            
-            // Set the grid template
-            boardElement.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
-            
-            for (let y = 0; y < BOARD_SIZE; y++) {
-                for (let x = 0; x < BOARD_SIZE; x++) {
-                    const value = board[y][x];
-                    const tile = document.createElement('div');
-                    tile.className = 'puzzle-tile';
-                    
-                    if (value === BOARD_SIZE * BOARD_SIZE) {
-                        tile.classList.add('empty');
-                        tile.textContent = '';
-                    } else {
-                        tile.textContent = value;
-                        tile.style.backgroundImage = `url('${puzzleImage}')`;
-                        tile.style.backgroundSize = `${BOARD_SIZE * 100}% ${BOARD_SIZE * 100}%`;
-                        tile.style.backgroundPosition = `-${x * 100}% -${y * 100}%`;
-                        
-                        tile.onclick = function() {
-                            posunDlazdici(x, y);
-                        };
-                    }
-                    
-                    boardElement.appendChild(tile);
+            checkWin() {
+                return this.tiles.every(tile => tile.currentPos === tile.correctPos);
+            },
+
+            updateMoves() {
+                document.getElementById('moves').textContent = this.moves;
+            },
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                    const minutes = Math.floor(elapsed / 60);
+                    const seconds = elapsed % 60;
+                    document.getElementById('time').textContent = 
+                        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }, 1000);
+            },
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
                 }
+            },
+
+            showCompletion() {
+                document.getElementById('overlay').classList.add('show');
+                document.getElementById('completionMessage').classList.add('show');
+                document.getElementById('finalMoves').textContent = this.moves;
+                document.getElementById('finalTime').textContent = document.getElementById('time').textContent;
+            },
+
+            closeCompletion() {
+                document.getElementById('overlay').classList.remove('show');
+                document.getElementById('completionMessage').classList.remove('show');
             }
-            
-            // Update move count
-            document.getElementById('moveCount').textContent = moveCount;
-        }
+        };
 
-        // Move a tile
-        function posunDlazdici(x, y) {
-            if (gameActive) {
-                let dx = Math.abs(x - emptyPos.x);
-                let dy = Math.abs(y - emptyPos.y);
-                
-                if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-                    board[emptyPos.y][emptyPos.x] = board[y][x];
-                    board[y][x] = 0;
-                    emptyPos = { x, y };
-                    
-                    moveCount++;
-                    document.getElementById('moveCount').textContent = moveCount;
-                    
-                    vykresliDesku();
-                    
-                    if (zkontrolujVyhru()) {
-                        vyhra();
-                    }
-                }
-            }
-        }
-
-        // Check if the puzzle is solved
-        function zkontrolujVyhru() {
-            if (jeVyreseno()) {
-                gameActive = false;
-                clearInterval(timer);
-                
-                // Update final stats
-                document.getElementById('finalMoves').textContent = moveCount;
-                document.getElementById('finalTime').textContent = document.getElementById('timeDisplay').textContent;
-                
-                // Show win message
-                document.getElementById('winMessage').style.display = 'block';
-                
-                return true;
-            }
-            return false;
-        }
-
-        // Check if the puzzle is solvable
-        function jeResitelne() {
-            let inversions = 0;
-            
-            for (let y = 0; y < BOARD_SIZE; y++) {
-                for (let x = 0; x < BOARD_SIZE; x++) {
-                    if (board[y][x] !== 0) {
-                        for (let i = y; i < BOARD_SIZE; i++) {
-                            for (let j = x + 1; j < BOARD_SIZE; j++) {
-                                if (board[i][j] !== 0 && board[i][j] < board[y][x]) {
-                                    inversions++;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return inversions % 2 === 0;
-        }
-
-        // Check if the puzzle is solved
-        function jeVyreseno() {
-            for (let y = 0; y < BOARD_SIZE; y++) {
-                for (let x = 0; x < BOARD_SIZE; x++) {
-                    if (y === BOARD_SIZE - 1 && x === BOARD_SIZE - 1) {
-                        return board[y][x] === 0;
-                    }
-                    if (board[y][x] !== y * BOARD_SIZE + x + 1) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        // Win the game
-        function vyhra() {
-            gameActive = false;
-            clearInterval(timer);
-            
-            // Update final stats
-            document.getElementById('finalMoves').textContent = moveCount;
-            document.getElementById('finalTime').textContent = document.getElementById('timeDisplay').textContent;
-            
-            // Show win message
-            document.getElementById('winMessage').style.display = 'block';
-        }
-
-        // Start the timer
-        function spustCasovac() {
-            seconds = 0;
-            document.getElementById('timeDisplay').textContent = '0:00';
-            
-            if (timer) clearInterval(timer);
-            
-            timer = setInterval(function() {
-                seconds++;
-                var minutes = Math.floor(seconds / 60);
-                var remainingSeconds = seconds % 60;
-                document.getElementById('timeDisplay').textContent = minutes + ':' + (remainingSeconds < 10 ? '0' : '') + remainingSeconds;
-            }, 1000);
-        }
-
-        // New game
-        function novaHra() {
-            // Reset game state
-            moveCount = 0;
-            seconds = 0;
-            gameActive = true;
-            document.getElementById('moveCount').textContent = '0';
-            document.getElementById('timeDisplay').textContent = '0:00';
-            
-            // Clear existing timer
-            if (timer) {
-                clearInterval(timer);
-                timer = null;
-            }
-            
-            // Hide win message
-            document.getElementById('winMessage').style.display = 'none';
-            
-            // Initialize and shuffle the board
-            inicializujDesku();
-            
-            // Make sure the puzzle is solvable
-            do {
-                zamichejDesku();
-            } while (!jeResitelne() || jeVyreseno());
-            
-            // Update the display
-            vykresliDesku();
-            
-            // Start the timer
-            spustCasovac();
-        }
-        // Start a new game when the page loads
-        window.onload = novaHra;
+        window.onload = () => game.init();
     </script>
 </body>
 </html>
