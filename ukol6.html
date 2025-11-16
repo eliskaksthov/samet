@@ -1,35 +1,329 @@
-<div class="lock" id="lock1">
-  <h3>Zámek 1</h3>
-  <div class="digits">
-    <span id="d1">0</span>
-    <span id="d2">0</span>
-  </div>
-  <button onclick="up(1,1)">▲</button>
-  <button onclick="down(1,1)">▼</button>
-  <button onclick="up(1,2)">▲</button>
-  <button onclick="down(1,2)">▼</button>
-  <p id="status1"></p>
-</div>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Najdi 5 rozdílů — Sametová revoluce</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-<script>
-let lock1 = [0,0];
-const correct1 = [1,7];
+        h1 {
+            font-family: 'Anton', sans-serif;
+            text-align: center;
+            color: var(--white);
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-function up(lock,num){
-  lock1[num-1] = (lock1[num-1]+1)%10;
-  document.getElementById(`d${num}`).innerText = lock1[num-1];
-  checkLock1();
-}
-function down(lock,num){
-  lock1[num-1] = (lock1[num-1]+9)%10; // -1 modulo 10
-  document.getElementById(`d${num}`).innerText = lock1[num-1];
-  checkLock1();
-}
-function checkLock1(){
-  if(lock1.every((v,i)=>v===correct1[i])){
-    document.getElementById("status1").innerText = "🔓 Odemčeno!";
-  } else {
-    document.getElementById("status1").innerText = "";
-  }
-}
-</script>
+        .subtitle {
+            text-align: center;
+            color: var(--white);
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .divider {
+            height: 3px;
+            background: var(--white);
+            margin: 0 auto 30px;
+            width: 100px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: var(--white);
+            font-size: 1.2em;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .image-container {
+            position: relative;
+            cursor: pointer;
+            max-width: 100%;
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--black);
+        }
+
+        .image-container img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .difference-marker {
+            position: absolute;
+            border: 3px solid red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            80% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .message {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.2em;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 2px solid #4caf50;
+        }
+
+        .restart-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 12px 20px;
+            background: var(--black);
+            color: var(--white);
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .restart-btn:hover {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1>NAJDI 5 ROZDÍLŮ</h1>
+                <p class="subtitle">Pozorně prozkoumej obrázky a najdi všech 5 rozdílů</p>
+                <div class="divider"></div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="game-info">
+                <div>Nalezeno: <span id="foundCount">0</span>/5</div>
+                <div>Čas: <span id="timer">00:00</span></div>
+            </div>
+
+            <div class="game-container">
+                <div class="image-container" id="image1">
+                    <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil1.jpg" alt="Obrázek 1">
+                </div>
+                <div class="image-container" id="image2">
+                    <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2">
+                </div>
+            </div>
+
+            <div id="message" class="message"></div>
+            <button class="restart-btn" id="restartBtn">Začít znovu</button>
+        </main>
+    </div>
+
+    <script>
+        // Game configuration
+        const config = {
+            differences: [
+                { x: 15, y: 30, radius: 30, found: false },
+                { x: 45, y: 25, radius: 30, found: false },
+                { x: 30, y: 55, radius: 30, found: false },
+                { x: 70, y: 40, radius: 30, found: false },
+                { x: 50, y: 75, radius: 30, found: false }
+            ],
+            foundCount: 0,
+            gameStarted: false,
+            startTime: null,
+            timerInterval: null
+        };
+
+        // DOM elements
+        const image1 = document.getElementById('image1');
+        const image2 = document.getElementById('image2');
+        const foundCountEl = document.getElementById('foundCount');
+        const timerEl = document.getElementById('timer');
+        const messageEl = document.getElementById('message');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Initialize the game
+        function initGame() {
+            // Reset game state
+            config.differences.forEach(diff => diff.found = false);
+            config.foundCount = 0;
+            config.gameStarted = true;
+            config.startTime = Date.now();
+            
+            // Update UI
+            foundCountEl.textContent = '0';
+            messageEl.style.display = 'none';
+            
+            // Clear existing markers
+            document.querySelectorAll('.difference-marker').forEach(el => el.remove());
+            
+            // Start timer
+            if (config.timerInterval) clearInterval(config.timerInterval);
+            updateTimer();
+            config.timerInterval = setInterval(updateTimer, 1000);
+            
+            // Add event listeners
+            image1.addEventListener('click', handleImageClick);
+            image2.addEventListener('click', handleImageClick);
+        }
+
+        // Handle image click
+        function handleImageClick(e) {
+            if (!config.gameStarted) return;
+            
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            checkForDifference(x, y, e.currentTarget);
+        }
+
+        // Check if click was on a difference
+        function checkForDifference(x, y, clickedImage) {
+            for (let i = 0; i < config.differences.length; i++) {
+                const diff = config.differences[i];
+                
+                if (diff.found) continue;
+                
+                const distance = Math.sqrt(
+                    Math.pow(diff.x - x, 2) + 
+                    Math.pow(diff.y - y, 2)
+                );
+                
+                if (distance < 5) { // 5% tolerance
+                    diff.found = true;
+                    config.foundCount++;
+                    foundCountEl.textContent = config.foundCount;
+                    
+                    // Show markers on both images
+                    showDifferenceMarker(diff, image1);
+                    showDifferenceMarker(diff, image2);
+                    
+                    // Play sound
+                    playSuccessSound();
+                    
+                    // Check if all differences found
+                    if (config.foundCount === config.differences.length) {
+                        endGame();
+                    }
+                    
+                    break;
+                }
+            }
+        }
+
+        // Show difference marker
+        function showDifferenceMarker(diff, container) {
+            const marker = document.createElement('div');
+            marker.className = 'difference-marker';
+            
+            const markerSize = diff.radius * 2;
+            marker.style.width = `${markerSize}px`;
+            marker.style.height = `${markerSize}px`;
+            marker.style.left = `${diff.x}%`;
+            marker.style.top = `${diff.y}%`;
+            
+            container.appendChild(marker);
+        }
+
+        // Play success sound
+        function playSuccessSound() {
+            // Simple beep sound
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // Update timer
+        function updateTimer() {
+            if (!config.gameStarted) return;
+            
+            const elapsed = Math.floor((Date.now() - config.startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            timerEl.textContent = `${minutes}:${seconds}`;
+        }
+
+        // End game
+        function endGame() {
+            config.gameStarted = false;
+            clearInterval(config.timerInterval);
+            
+            messageEl.textContent = 'Gratulujeme! Našel jsi všech 5 rozdílů! Získáváš písmeno E';
+            messageEl.className = 'message success';
+            messageEl.style.display = 'block';
+            
+            // Remove event listeners
+            image1.removeEventListener('click', handleImageClick);
+            image2.removeEventListener('click', handleImageClick);
+        }
+
+        // Event listeners
+        restartBtn.addEventListener('click', initGame);
+
+        // Start the game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
