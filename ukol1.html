@@ -228,16 +228,17 @@
                 });
             },
 
-            loadImage() {
-                this.image = new Image();
-                this.image.crossOrigin = "anonymous";
-                this.image.onload = () => {
-                    this.newGame();
-                };
-                // Nahraďte tuto URL base64 kódováním vašeho obrázku nebo použijte relativní cestu
-                this.image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-                // Pro GitHub/Vercel použijte: this.image.src = './image.jpg';
-            },
+           loadImage() {
+    this.image = new Image();
+    this.image.crossOrigin = "anonymous";
+    this.image.onload = () => {
+        this.newGame();
+    };
+    // GitHub raw link (veřejně přístupný obrázek)
+    this.image.src = 'https://raw.githubusercontent.com/eliskaksthov/samet/main/samet%20obrazek.png';
+    // Pokud hostujete obrázek přímo s webem (např. Vercel/GitHub Pages):
+    // this.image.src = './samet obrazek.png';
+},
 
             newGame() {
                 this.moves = 0;
