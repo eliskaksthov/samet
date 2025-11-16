@@ -1,15 +1,140 @@
-<!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 3 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <audio controls>
-  <source src="https://cdn.jsdelivr.net/gh/eliskaksthov/samet@main/Marta%20Kubi%C5%A1ov%C3%A1%20%20%20Modlitba%20pro%20Martu.mp3" type="audio/mpeg">
-</audio>
-    </body>
-    </html>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Úkol 3 — Poznej píseň</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .task-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        .audio-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .question {
+            margin: 25px 0 15px;
+            color: var(--white);
+            font-size: 1.3rem;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0 20px;
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+        
+        .submit-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto 0;
+            padding: 12px 20px;
+            background: var(--black);
+            color: var(--white);
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: var(--white);
+            color: var(--black);
+        }
+        
+        .message {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .success {
+            background: rgba(0, 200, 0, 0.2);
+            color: #4caf50;
+            border: 2px solid #4caf50;
+        }
+        
+        .error {
+            background: rgba(200, 0, 0, 0.2);
+            color: #f44336;
+            border: 2px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1>POZNEJ PÍSEŇ</h1>
+                <p class="subtitle">17. listopad 1989</p>
+                <div class="divider"></div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="task-container">
+                <div class="audio-container">
+                    <audio controls>
+                        <source src="https://cdn.jsdelivr.net/gh/eliskaksthov/samet@main/Marta%20Kubi%C5%A1ov%C3%A1%20%20%20Modlitba%20pro%20Martu.mp3" type="audio/mpeg">
+                        Váš prohlížeč nepodporuje přehrávání audia.
+                    </audio>
+                </div>
+                
+                <div class="question">Jak se jmenuje tato píseň?</div>
+                <input type="text" id="songName" class="answer-input" placeholder="Napište název písně">
+                
+                <div class="question">Kdo je autorem této písně?</div>
+                <input type="text" id="songAuthor" class="answer-input" placeholder="Napište jméno autora">
+                
+                <button class="submit-btn" onclick="checkAnswers()">Odeslat odpovědi</button>
+                
+                <div id="message" class="message"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function checkAnswers() {
+            const songName = document.getElementById('songName').value.toLowerCase();
+            const songAuthor = document.getElementById('songAuthor').value.toLowerCase();
+            const message = document.getElementById('message');
+            
+            const correctSong = 'modlitba pro martu';
+            const correctAuthor = 'marta kubisova';
+            
+            if (songName === correctSong && songAuthor === correctAuthor) {
+                message.textContent = 'Správná odpověď! Získáváš písmeno S';
+                message.className = 'message success';
+            } else {
+                message.textContent = 'Nesprávná odpověď. Zkuste to znovu.';
+                message.className = 'message error';
+            }
+            message.style.display = 'block';
+            
+            // Scroll to message
+            message.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Allow form submission on Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswers();
+            }
+        });
+    </script>
+</body>
+</html>
