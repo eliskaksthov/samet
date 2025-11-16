@@ -56,19 +56,25 @@
             position: relative;
         }
 
-        .image-container {
+        .image-wrapper {
             position: relative;
-            cursor: pointer;
-            max-width: 100%;
+            display: inline-block;
             border: 2px solid var(--white);
             border-radius: 8px;
             overflow: hidden;
             background: var(--black);
         }
 
+        .image-container {
+            position: relative;
+            cursor: pointer;
+            max-width: 100%;
+            width: 600px;
+        }
+
         .image-container img {
             display: block;
-            max-width: 100%;
+            width: 100%;
             height: auto;
         }
 
@@ -79,6 +85,41 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
             animation: popIn 0.3s ease-out;
+            width: 60px;
+            height: 60px;
+            z-index: 10;
+        }
+
+        .difference-hint {
+            position: absolute;
+            background-color: rgba(255, 0, 0, 0.3);
+            border: 2px solid red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+            width: 70px;
+            height: 70px;
+        }
+
+        .difference-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            white-space: nowrap;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .difference-hint:hover + .difference-label {
+            opacity: 1;
         }
 
         @keyframes popIn {
@@ -135,6 +176,11 @@
             h1 {
                 font-size: 2em;
             }
+            
+            .image-container {
+                width: 100%;
+                max-width: 400px;
+            }
         }
     </style>
 </head>
@@ -155,11 +201,15 @@
             </div>
 
             <div class="game-container">
-                <div class="image-container" id="image1">
-                    <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil1.jpg" alt="Obrázek 1">
+                <div class="image-wrapper">
+                    <div class="image-container" id="image1">
+                        <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil1.jpg" alt="Obrázek 1">
+                    </div>
                 </div>
-                <div class="image-container" id="image2">
-                    <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2">
+                <div class="image-wrapper">
+                    <div class="image-container" id="image2">
+                        <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2">
+                    </div>
                 </div>
             </div>
 
@@ -169,14 +219,49 @@
     </div>
 
     <script>
-        // Game configuration
+        // Game configuration with exact positions from the image
         const config = {
             differences: [
-                { x: 15, y: 30, radius: 30, found: false },
-                { x: 45, y: 25, radius: 30, found: false },
-                { x: 30, y: 55, radius: 30, found: false },
-                { x: 70, y: 40, radius: 30, found: false },
-                { x: 50, y: 75, radius: 30, found: false }
+                { 
+                    id: 1,
+                    x: 52, 
+                    y: 10, 
+                    radius: 30, 
+                    found: false,
+                    description: "Vlajka na kopí sv. Václava"
+                },
+                { 
+                    id: 2,
+                    x: 50, 
+                    y: 85, 
+                    radius: 40, 
+                    found: false,
+                    description: "Banner \"SVOBODA – DUBČEK – ČERNÍK\""
+                },
+                { 
+                    id: 3,
+                    x: 35, 
+                    y: 75, 
+                    radius: 35, 
+                    found: false,
+                    description: "Skupina lidí sedících na podstavci vlevo"
+                },
+                { 
+                    id: 4,
+                    x: 65, 
+                    y: 78, 
+                    radius: 35, 
+                    found: false,
+                    description: "Plakát s nápisy \"MAO\", \"KOSYG\", \"MONOPOL\""
+                },
+                { 
+                    id: 5,
+                    x: 50, 
+                    y: 92, 
+                    radius: 30, 
+                    found: false,
+                    description: "Ručně psaný vzkaz (spodní střed)"
+                }
             ],
             foundCount: 0,
             gameStarted: false,
@@ -205,7 +290,10 @@
             messageEl.style.display = 'none';
             
             // Clear existing markers
-            document.querySelectorAll('.difference-marker').forEach(el => el.remove());
+            document.querySelectorAll('.difference-marker, .difference-hint, .difference-label').forEach(el => el.remove());
+            
+            // Add hint circles
+            addHintCircles();
             
             // Start timer
             if (config.timerInterval) clearInterval(config.timerInterval);
@@ -215,6 +303,33 @@
             // Add event listeners
             image1.addEventListener('click', handleImageClick);
             image2.addEventListener('click', handleImageClick);
+        }
+
+        // Add hint circles (semi-transparent red circles)
+        function addHintCircles() {
+            const containers = [image1, image2];
+            
+            containers.forEach(container => {
+                config.differences.forEach(diff => {
+                    // Create hint circle
+                    const hint = document.createElement('div');
+                    hint.className = 'difference-hint';
+                    hint.dataset.id = diff.id;
+                    hint.style.left = `${diff.x}%`;
+                    hint.style.top = `${diff.y}%`;
+                    hint.style.width = `${diff.radius * 2}px`;
+                    hint.style.height = `${diff.radius * 2}px`;
+                    container.appendChild(hint);
+                    
+                    // Create label
+                    const label = document.createElement('div');
+                    label.className = 'difference-label';
+                    label.textContent = diff.description;
+                    label.style.left = `${diff.x}%`;
+                    label.style.top = `${diff.y}%`;
+                    container.appendChild(label);
+                });
+            });
         }
 
         // Handle image click
@@ -252,6 +367,11 @@
                     // Play sound
                     playSuccessSound();
                     
+                    // Remove the hint circle and label
+                    document.querySelectorAll(`.difference-hint[data-id="${diff.id}"], .difference-label`).forEach(el => {
+                        el.style.display = 'none';
+                    });
+                    
                     // Check if all differences found
                     if (config.foundCount === config.differences.length) {
                         endGame();
@@ -266,14 +386,21 @@
         function showDifferenceMarker(diff, container) {
             const marker = document.createElement('div');
             marker.className = 'difference-marker';
-            
-            const markerSize = diff.radius * 2;
-            marker.style.width = `${markerSize}px`;
-            marker.style.height = `${markerSize}px`;
             marker.style.left = `${diff.x}%`;
             marker.style.top = `${diff.y}%`;
+            marker.style.width = `${diff.radius * 2}px`;
+            marker.style.height = `${diff.radius * 2}px`;
+            
+            // Add tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'difference-label';
+            tooltip.textContent = diff.description;
+            tooltip.style.left = `${diff.x}%`;
+            tooltip.style.top = `${diff.y}%`;
+            tooltip.style.opacity = '1';
             
             container.appendChild(marker);
+            container.appendChild(tooltip);
         }
 
         // Play success sound
@@ -317,6 +444,9 @@
             // Remove event listeners
             image1.removeEventListener('click', handleImageClick);
             image2.removeEventListener('click', handleImageClick);
+            
+            // Remove all hint circles and labels
+            document.querySelectorAll('.difference-hint, .difference-label').forEach(el => el.remove());
         }
 
         // Event listeners
