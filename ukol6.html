@@ -1,57 +1,35 @@
-<style>
-    .safe-box {
-        margin: 30px auto;
-        padding: 20px;
-        width: 250px;
-        background: #222;
-        border-radius: 15px;
-        text-align: center;
-        color: white;
-        font-family: Arial;
-    }
-    .dial {
-        font-size: 22px;
-        padding: 10px;
-        margin: 8px;
-        border-radius: 8px;
-    }
-    #unlocked {
-        display: none;
-        margin-top: 20px;
-        font-size: 22px;
-        color: #00ff9d;
-    }
-</style>
-
-<div class="safe-box">
-    <h3>Odemkni sejf</h3>
-    <p>Zadej správnou kombinaci</p>
-
-    <select class="dial" id="d1">
-        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
-    </select>
-    <select class="dial" id="d2">
-        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
-    </select>
-    <select class="dial" id="d3">
-        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
-    </select>
-    <select class="dial" id="d4">
-        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
-    </select>
-
-    <div id="unlocked">🔓 Odemčeno! Kód je: <b>SVOBODA</b></div>
+<div class="lock" id="lock1">
+  <h3>Zámek 1</h3>
+  <div class="digits">
+    <span id="d1">0</span>
+    <span id="d2">0</span>
+  </div>
+  <button onclick="up(1,1)">▲</button>
+  <button onclick="down(1,1)">▼</button>
+  <button onclick="up(1,2)">▲</button>
+  <button onclick="down(1,2)">▼</button>
+  <p id="status1"></p>
 </div>
 
 <script>
-    const correct = ["1", "9", "8", "9"]; // nastavení správné kombinace
+let lock1 = [0,0];
+const correct1 = [1,7];
 
-    const dials = ["d1","d2","d3","d4"].map(id => document.getElementById(id));
-    dials.forEach(d => d.addEventListener("change", check));
-
-    function check() {
-        if (dials.every((d,i) => d.value === correct[i])) {
-            document.getElementById("unlocked").style.display = "block";
-        }
-    }
+function up(lock,num){
+  lock1[num-1] = (lock1[num-1]+1)%10;
+  document.getElementById(`d${num}`).innerText = lock1[num-1];
+  checkLock1();
+}
+function down(lock,num){
+  lock1[num-1] = (lock1[num-1]+9)%10; // -1 modulo 10
+  document.getElementById(`d${num}`).innerText = lock1[num-1];
+  checkLock1();
+}
+function checkLock1(){
+  if(lock1.every((v,i)=>v===correct1[i])){
+    document.getElementById("status1").innerText = "🔓 Odemčeno!";
+  } else {
+    document.getElementById("status1").innerText = "";
+  }
+}
 </script>
