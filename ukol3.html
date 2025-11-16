@@ -108,15 +108,27 @@
     </div>
 
     <script>
+        function normalizeString(str) {
+            return str.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove diacritics
+                .replace(/\s+/g, ' ') // replace multiple spaces with single space
+                .trim();
+        }
+        
         function checkAnswers() {
-            const songName = document.getElementById('songName').value.toLowerCase();
-            const songAuthor = document.getElementById('songAuthor').value.toLowerCase();
+            const songName = normalizeString(document.getElementById('songName').value);
+            const songAuthor = normalizeString(document.getElementById('songAuthor').value);
             const message = document.getElementById('message');
             
-            const correctSong = 'modlitba pro martu';
-            const correctAuthor = 'marta kubisova';
+            // Accept multiple correct answers
+            const correctSongs = ['modlitba pro martu', 'modlitba pro martu'];
+            const correctAuthors = ['marta kubisova', 'kubisova'];
             
-            if (songName === correctSong && songAuthor === correctAuthor) {
+            // Check if the answer matches any of the correct options
+            const isSongCorrect = correctSongs.includes(songName);
+            const isAuthorCorrect = correctAuthors.some(author => songAuthor.includes(author));
+            
+            if (isSongCorrect && isAuthorCorrect) {
                 message.textContent = 'Správná odpověď! Získáváš písmeno S';
                 message.className = 'message success';
             } else {
