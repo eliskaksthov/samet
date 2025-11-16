@@ -56,19 +56,25 @@
             position: relative;
         }
 
-        .image-container {
+        .image-wrapper {
             position: relative;
-            cursor: pointer;
-            max-width: 100%;
+            display: inline-block;
             border: 2px solid var(--white);
             border-radius: 8px;
             overflow: hidden;
             background: var(--black);
         }
 
+        .image-container {
+            position: relative;
+            cursor: pointer;
+            max-width: 100%;
+            width: 600px;
+        }
+
         .image-container img {
             display: block;
-            max-width: 100%;
+            width: 100%;
             height: auto;
         }
 
@@ -79,6 +85,21 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
             animation: popIn 0.3s ease-out;
+            width: 60px;
+            height: 60px;
+            z-index: 10;
+        }
+
+        .difference-hint {
+            position: absolute;
+            background-color: rgba(255, 0, 0, 0.3);
+            border: 2px solid red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+            width: 70px;
+            height: 70px;
         }
 
         @keyframes popIn {
@@ -135,6 +156,11 @@
             h1 {
                 font-size: 2em;
             }
+            
+            .image-container {
+                width: 100%;
+                max-width: 400px;
+            }
         }
     </style>
 </head>
@@ -155,11 +181,15 @@
             </div>
 
             <div class="game-container">
-                <div class="image-container" id="image1">
-                    <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil1.jpg" alt="Obrázek 1">
+                <div class="image-wrapper">
+                    <div class="image-container" id="image1">
+                        <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil1.jpg" alt="Obrázek 1">
+                    </div>
                 </div>
-                <div class="image-container" id="image2">
-                    <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2">
+                <div class="image-wrapper">
+                    <div class="image-container" id="image2">
+                        <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2">
+                    </div>
                 </div>
             </div>
 
@@ -169,14 +199,14 @@
     </div>
 
     <script>
-        // Game configuration
+        // Game configuration with exact positions from the image
         const config = {
             differences: [
-                { x: 15, y: 30, radius: 30, found: false },
-                { x: 45, y: 25, radius: 30, found: false },
-                { x: 30, y: 55, radius: 30, found: false },
-                { x: 70, y: 40, radius: 30, found: false },
-                { x: 50, y: 75, radius: 30, found: false }
+                { x: 15, y: 30, radius: 30, found: false },  // Top left corner
+                { x: 45, y: 25, radius: 30, found: false },  // Top middle
+                { x: 30, y: 55, radius: 30, found: false },  // Middle left
+                { x: 70, y: 40, radius: 30, found: false },  // Top right
+                { x: 50, y: 75, radius: 30, found: false }   // Bottom middle
             ],
             foundCount: 0,
             gameStarted: false,
@@ -205,7 +235,10 @@
             messageEl.style.display = 'none';
             
             // Clear existing markers
-            document.querySelectorAll('.difference-marker').forEach(el => el.remove());
+            document.querySelectorAll('.difference-marker, .difference-hint').forEach(el => el.remove());
+            
+            // Add hint circles
+            addHintCircles();
             
             // Start timer
             if (config.timerInterval) clearInterval(config.timerInterval);
@@ -215,6 +248,21 @@
             // Add event listeners
             image1.addEventListener('click', handleImageClick);
             image2.addEventListener('click', handleImageClick);
+        }
+
+        // Add hint circles (semi-transparent red circles)
+        function addHintCircles() {
+            const containers = [image1, image2];
+            
+            containers.forEach(container => {
+                config.differences.forEach(diff => {
+                    const hint = document.createElement('div');
+                    hint.className = 'difference-hint';
+                    hint.style.left = `${diff.x}%`;
+                    hint.style.top = `${diff.y}%`;
+                    container.appendChild(hint);
+                });
+            });
         }
 
         // Handle image click
@@ -252,6 +300,10 @@
                     // Play sound
                     playSuccessSound();
                     
+                    // Remove the hint circle
+                    const hints = document.querySelectorAll('.difference-hint');
+                    if (hints[i]) hints[i].style.display = 'none';
+                    
                     // Check if all differences found
                     if (config.foundCount === config.differences.length) {
                         endGame();
@@ -267,9 +319,6 @@
             const marker = document.createElement('div');
             marker.className = 'difference-marker';
             
-            const markerSize = diff.radius * 2;
-            marker.style.width = `${markerSize}px`;
-            marker.style.height = `${markerSize}px`;
             marker.style.left = `${diff.x}%`;
             marker.style.top = `${diff.y}%`;
             
@@ -317,6 +366,9 @@
             // Remove event listeners
             image1.removeEventListener('click', handleImageClick);
             image2.removeEventListener('click', handleImageClick);
+            
+            // Remove all hint circles
+            document.querySelectorAll('.difference-hint').forEach(el => el.remove());
         }
 
         // Event listeners
