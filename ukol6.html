@@ -203,46 +203,13 @@
     <script>
         // Definice rozdílů - přesné souřadnice z původního obrázku
         // Formát: (x_pixel, y_pixel, radius_pixel)
-                        <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2" id="image2">
-
-            </div>
-
-        </div>
-
-        <div class="congratulations" id="congratulations">
-
-            🎉 Gratulujeme! Našli jste všech 5 rozdílů! 🎉
-
-        </div>
-
-        <div class="controls">
-
-            <button class="reset-btn" id="resetBtn">🔄 Začít znovu</button>
-
-        </div>
-
-    </div>
-
-    <script>
-
-        // Definice rozdílů - přesné souřadnice z původního obrázku
-
-        // Formát: (x_pixel, y_pixel, radius_pixel)
-
         const differences = [
-
-            { x: 290, y: 250, radius: 80, found: false },  // Rozdíl 1: Vlajka (bude ovál)
-
-            { x: 620, y: 274, radius: 100, found: false },  // Rozdíl 2: Obloha (kruh)
-
-            { x: 70, y: 645, radius: 37, found: false },   // Rozdíl 3: Kříž (kruh)
-
-            { x: 337, y: 835, radius: 42, found: false },  // Rozdíl 4: Lidé (kruh)
-
-            { x: 325, y: 1028, radius: 110, found: false } // Rozdíl 5: Spodní pás (bude ovál)
-
-    ]
-
+            { x: 191, y: 284, radius: 74, found: false },  // Rozdíl 1: Vlajka (bude ovál)
+            { x: 596, y: 274, radius: 88, found: false },  // Rozdíl 2: Obloha (kruh)
+            { x: 74, y: 550, radius: 37, found: false },   // Rozdíl 3: Kříž (kruh)
+            { x: 339, y: 821, radius: 51, found: false },  // Rozdíl 4: Lidé (kruh)
+            { x: 346, y: 1028, radius: 118, found: false } // Rozdíl 5: Spodní pás (bude ovál)
+        ];
 
         const originalWidth = 736;  // Původní šířka obrázku
         const originalHeight = 1104; // Původní výška obrázku (přesnější odhad pro výpočet)
@@ -395,4 +362,5 @@
     </script>
 </body>
 </html>
+
 
