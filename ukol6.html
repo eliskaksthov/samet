@@ -1,23 +1,57 @@
-<!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 6 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 6</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWER6', 'ukol7.html')">Odeslat</button>
-        </div>
-        <p id="feedback"></p>
-        <div class="footer">Správná odpověď (dočasná): <strong>ANSWER6</strong></div>
-      </div>
-    </body>
-    </html>
+<style>
+    .safe-box {
+        margin: 30px auto;
+        padding: 20px;
+        width: 250px;
+        background: #222;
+        border-radius: 15px;
+        text-align: center;
+        color: white;
+        font-family: Arial;
+    }
+    .dial {
+        font-size: 22px;
+        padding: 10px;
+        margin: 8px;
+        border-radius: 8px;
+    }
+    #unlocked {
+        display: none;
+        margin-top: 20px;
+        font-size: 22px;
+        color: #00ff9d;
+    }
+</style>
+
+<div class="safe-box">
+    <h3>Odemkni sejf</h3>
+    <p>Zadej správnou kombinaci</p>
+
+    <select class="dial" id="d1">
+        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
+    </select>
+    <select class="dial" id="d2">
+        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
+    </select>
+    <select class="dial" id="d3">
+        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
+    </select>
+    <select class="dial" id="d4">
+        <script>for(let i=0;i<=9;i++) document.write(`<option>${i}</option>`);</script>
+    </select>
+
+    <div id="unlocked">🔓 Odemčeno! Kód je: <b>SVOBODA</b></div>
+</div>
+
+<script>
+    const correct = ["1", "9", "8", "9"]; // nastavení správné kombinace
+
+    const dials = ["d1","d2","d3","d4"].map(id => document.getElementById(id));
+    dials.forEach(d => d.addEventListener("change", check));
+
+    function check() {
+        if (dials.every((d,i) => d.value === correct[i])) {
+            document.getElementById("unlocked").style.display = "block";
+        }
+    }
+</script>
