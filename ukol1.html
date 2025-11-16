@@ -164,18 +164,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧩 Puzzle - Česká Vlajka</h1>
+        <h1>🧩 Puzzle - Česká Vlajka (3×3)</h1>
         
         <div class="controls">
-            <div class="difficulty">
-                <label for="difficulty">Obtížnost:</label>
-                <select id="difficulty">
-                    <option value="3">Snadná (3×3)</option>
-                    <option value="4" selected>Střední (4×4)</option>
-                    <option value="5">Těžká (5×5)</option>
-                    <option value="6">Expert (6×6)</option>
-                </select>
-            </div>
             <button onclick="game.newGame()">Nová hra</button>
             <button onclick="game.shuffle()">Zamíchat</button>
         </div>
@@ -207,7 +198,7 @@
             canvas: null,
             ctx: null,
             image: null,
-            gridSize: 4,
+            gridSize: 3,
             tileSize: 0,
             tiles: [],
             emptyTile: null,
@@ -222,10 +213,6 @@
                 this.loadImage();
                 
                 this.canvas.addEventListener('click', (e) => this.handleClick(e));
-                document.getElementById('difficulty').addEventListener('change', (e) => {
-                    this.gridSize = parseInt(e.target.value);
-                    this.newGame();
-                });
             },
 
            loadImage() {
