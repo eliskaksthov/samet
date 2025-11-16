@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Úkol 4 — Chronologické řazení</title>
+    <title>Úkol 5 — Párovací hra</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .container {
@@ -36,56 +36,79 @@
             width: 100px;
         }
 
-        .timeline-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 2px solid var(--white);
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: var(--white);
+            font-size: 1.2em;
         }
 
-        .event-card {
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            perspective: 1000px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .card-front {
             background: var(--blue);
             border: 2px solid var(--white);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            cursor: move;
-            user-select: none;
-            transition: transform 0.2s, box-shadow 0.2s;
             color: var(--white);
-            font-size: 1.1em;
-            position: relative;
+            transform: rotateY(180deg);
+            overflow: hidden;
         }
 
-        .event-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .event-card.dragging {
-            opacity: 0.5;
-            background: var(--red);
-        }
-
-        .check-button {
-            display: block;
-            width: 200px;
-            margin: 30px auto;
-            padding: 12px 20px;
+        .card-back {
             background: var(--black);
-            color: var(--white);
             border: 2px solid var(--white);
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Open Sans', sans-serif;
+            color: var(--white);
+            font-size: 2em;
         }
 
-        .check-button:hover {
-            background: var(--white);
-            color: var(--black);
+        .card img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
         .message {
@@ -104,16 +127,17 @@
             border: 2px solid #4caf50;
         }
 
-        .error {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 2px solid #f44336;
+        .timer {
+            color: var(--white);
+            font-size: 1.2em;
+            text-align: center;
+            margin: 10px 0;
         }
 
         @media (max-width: 600px) {
-            .event-card {
-                padding: 12px;
-                font-size: 1em;
+            .game-board {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
             }
             
             h1 {
@@ -126,37 +150,121 @@
     <div class="container">
         <header class="hero">
             <div class="hero-content">
-                <h1>CHRONOLOGIE UDÁLOSTÍ</h1>
-                <p class="subtitle">Seřaďte události Sametové revoluce chronologicky</p>
+                <h1>PÁROVACÍ HRA</h1>
+                <p class="subtitle">Najděte dvojice pojmů z doby Sametové revoluce</p>
                 <div class="divider"></div>
             </div>
         </header>
 
         <main class="content">
-            <div class="timeline-container" id="timeline">
-                <!-- Event cards will be inserted here by JavaScript -->
+            <div class="game-info">
+                <div>Čas: <span id="time">00:00</span></div>
+                <div>Dvojice: <span id="pairs">0/8</span></div>
+            </div>
+            
+            <div class="game-board" id="gameBoard">
+                <!-- Cards will be inserted here by JavaScript -->
             </div>
 
-            <button class="check-button" id="checkOrder">Ověřit pořadí</button>
             <div id="message" class="message"></div>
         </main>
     </div>
 
     <script>
-        // Event data with correct order (chronological)
-        const events = [
-            { id: 1, text: "17. listopad 1989 – Studentská demonstrace na Národní třídě" },
-            { id: 2, text: "Policie zasahuje proti demonstrantům" },
-            { id: 3, text: "Studenti a občané cinkají klíči na podporu svobody" },
-            { id: 4, text: "Masové demonstrace na Václavském náměstí" },
-            { id: 5, text: "Vznik Občanského fóra" },
-            { id: 6, text: "První stávky vysokých škol a divadel" },
-            { id: 7, text: "Rozhlas Svobodná Evropa informuje o protestech" },
-            { id: 8, text: "Václav Havel se stává prezidentem Československa" },
-            { id: 9, text: "Sametová revoluce přináší svobodu a demokracii" }
+        // Game data - pairs of [text, imageUrl]
+        const cardPairs = [
+            {
+                text: "Klíč",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/kl%C3%AD%C4%8De.jpg"
+            },
+            {
+                text: "Václav Havel",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/havel.jpg"
+            },
+            {
+                text: "Policie",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/policie.jpg"
+            },
+            {
+                text: "Komunistická strana Československa",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/ks%C4%8D.png"
+            },
+            {
+                text: "Občanské fórum",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/obcansk%C3%A9%20forum.jpg"
+            },
+            {
+                text: "Česká a Slovenská Federativní Republika",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/%C4%8Deskaaslovenskafedrep.jpg"
+            },
+            {
+                text: "Demonstrace",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/demonstrace.jpg"
+            },
+            {
+                text: "Svíčky",
+                image: "https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/sv%C3%AD%C4%8Dky.jpg"
+            }
         ];
 
-        // Shuffle function to randomize the initial order
+        let cards = [];
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let matchedPairs = 0;
+        let timer;
+        let seconds = 0;
+
+        // Create the game board
+        function createBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            const cardsArray = [];
+            
+            // Create pairs of cards
+            cardPairs.forEach((pair, index) => {
+                // Text card
+                cardsArray.push({
+                    id: index * 2,
+                    content: pair.text,
+                    type: 'text',
+                    pairId: index
+                });
+                
+                // Image card
+                cardsArray.push({
+                    id: index * 2 + 1,
+                    content: pair.image,
+                    type: 'image',
+                    pairId: index
+                });
+            });
+            
+            // Shuffle cards
+            cards = shuffleArray(cardsArray);
+            
+            // Create card elements
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.dataset.index = index;
+                
+                cardElement.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-back">?</div>
+                        <div class="card-front">
+                            ${card.type === 'image' 
+                                ? `<img src="${card.content}" alt="${card.content}">` 
+                                : card.content}
+                        </div>
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', flipCard);
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        // Shuffle array
         function shuffleArray(array) {
             const newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -166,158 +274,97 @@
             return newArray;
         }
 
-        // Create draggable event cards
-        function createEventCards() {
-            const timeline = document.getElementById('timeline');
-            const shuffledEvents = shuffleArray(events);
-            
-            shuffledEvents.forEach(event => {
-                const card = document.createElement('div');
-                card.className = 'event-card';
-                card.draggable = true;
-                card.dataset.id = event.id;
-                card.textContent = event.text;
-                
-                // Add drag and drop event listeners
-                card.addEventListener('dragstart', handleDragStart);
-                card.addEventListener('dragover', handleDragOver);
-                card.addEventListener('drop', handleDrop);
-                card.addEventListener('dragend', handleDragEnd);
-                card.addEventListener('touchstart', handleTouchStart, { passive: true });
-                card.addEventListener('touchmove', handleTouchMove, { passive: false });
-                card.addEventListener('touchend', handleTouchEnd);
-                
-                timeline.appendChild(card);
-            });
-        }
+        // Flip card
+        function flipCard() {
+            if (lockBoard || this === firstCard || this.classList.contains('matched')) return;
 
-        // Drag and drop functionality
-        let draggedItem = null;
-        let touchStartY = 0;
-        let touchMoved = false;
+            this.classList.add('flipped');
 
-        function handleDragStart(e) {
-            draggedItem = this;
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML);
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            return false;
-        }
-
-        function handleDrop(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            if (draggedItem !== this) {
-                const timeline = document.getElementById('timeline');
-                const items = Array.from(timeline.querySelectorAll('.event-card'));
-                const fromIndex = items.indexOf(draggedItem);
-                const toIndex = items.indexOf(this);
-                
-                if (fromIndex < toIndex) {
-                    timeline.insertBefore(draggedItem, this.nextSibling);
-                } else {
-                    timeline.insertBefore(draggedItem, this);
-                }
+            if (!hasFlippedCard) {
+                // First card
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
             }
-            
-            return false;
+
+            // Second card
+            secondCard = this;
+            checkForMatch();
         }
 
-        function handleDragEnd() {
-            this.classList.remove('dragging');
-            return false;
-        }
+        // Check for match
+        function checkForMatch() {
+            const firstIndex = firstCard.dataset.index;
+            const secondIndex = secondCard.dataset.index;
+            const firstCardData = cards[firstIndex];
+            const secondCardData = cards[secondIndex];
 
-        // Touch event handlers for mobile
-        function handleTouchStart(e) {
-            touchStartY = e.touches[0].clientY;
-            touchMoved = false;
-            this.classList.add('dragging');
-            draggedItem = this;
-        }
+            const isMatch = firstCardData.pairId === secondCardData.pairId;
 
-        function handleTouchMove(e) {
-            touchMoved = true;
-            e.preventDefault();
-        }
-
-        function handleTouchEnd(e) {
-            this.classList.remove('dragging');
-            
-            if (!touchMoved) return;
-            
-            const touchEndY = e.changedTouches[0].clientY;
-            const touchDiff = touchStartY - touchEndY;
-            const items = Array.from(document.querySelectorAll('.event-card'));
-            const currentIndex = items.indexOf(this);
-            
-            if (Math.abs(touchDiff) > 20) { // Minimum distance to trigger reorder
-                let targetIndex;
-                
-                if (touchDiff > 0 && currentIndex > 0) {
-                    // Move up
-                    targetIndex = currentIndex - 1;
-                } else if (touchDiff < 0 && currentIndex < items.length - 1) {
-                    // Move down
-                    targetIndex = currentIndex + 1;
-                } else {
-                    return;
-                }
-                
-                const timeline = document.getElementById('timeline');
-                const targetItem = items[targetIndex];
-                
-                if (touchDiff > 0) {
-                    timeline.insertBefore(this, targetItem);
-                } else {
-                    timeline.insertBefore(targetItem, this);
-                }
-            }
-        }
-
-        // Check if the order is correct
-        function checkOrder() {
-            const items = Array.from(document.querySelectorAll('.event-card'));
-            const message = document.getElementById('message');
-            let isCorrect = true;
-            
-            for (let i = 0; i < items.length; i++) {
-                const itemId = parseInt(items[i].dataset.id);
-                if (itemId !== i + 1) {
-                    isCorrect = false;
-                    break;
-                }
-            }
-            
-            if (isCorrect) {
-                message.textContent = 'Správně! Získáváš písmeno O';
-                message.className = 'message success';
+            if (isMatch) {
+                disableCards();
+                matchedPairs++;
+                updatePairsCount();
+                checkWin();
             } else {
-                message.textContent = 'Zkus to znovu, některé události nejsou ve správném pořadí.';
-                message.className = 'message error';
+                unflipCards();
             }
-            
-            message.style.display = 'block';
-            message.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        function updatePairsCount() {
+            document.getElementById('pairs').textContent = `${matchedPairs}/${cardPairs.length}`;
+        }
+
+        function checkWin() {
+            if (matchedPairs === cardPairs.length) {
+                clearInterval(timer);
+                const message = document.getElementById('message');
+                message.textContent = 'Skvělé! Získáváš písmeno Č';
+                message.className = 'message success';
+                message.style.display = 'block';
+            }
+        }
+
+        // Timer
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                document.getElementById('time').textContent = `${minutes}:${secs}`;
+            }, 1000);
         }
 
         // Initialize the game
         document.addEventListener('DOMContentLoaded', () => {
-            createEventCards();
-            document.getElementById('checkOrder').addEventListener('click', checkOrder);
-            
-            // Prevent default touch behavior for the document
-            document.addEventListener('touchmove', (e) => {
-                if (touchMoved) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
+            createBoard();
+            updatePairsCount();
+            startTimer();
         });
     </script>
 </body>
