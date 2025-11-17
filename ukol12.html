@@ -9,31 +9,29 @@
   <style>
     .container { max-width: 880px; margin:24px auto; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); background:#000; }
     .meta { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
-    .timer { font-weight:700; }
-    .game-area { border:1px solid #fff; padding:12px; border-radius:6px; min-height:140px; overflow:auto; white-space:pre-wrap; font-family:inherit; background:#00; }
-    .assembly { margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .timer { font-weight:700; color:#fff; }
+    .game-area { border:1px solid #fff; padding:12px; border-radius:6px; min-height:140px; overflow:auto; white-space:pre-wrap; font-family:inherit; background:transparent; color:#fff; }
+    .assembly { margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:#fff; }
     input[type="text"].assembled { padding:8px; min-width:260px; }
-    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#00; cursor:pointer; }
-    button.primary { background:#00; color:#fff; border-color:#1f63d6; }
-    .status { margin-top:10px; font-weight:700; }
-    .hint { margin-top:10px; color:#444; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#222; cursor:pointer; color:#fff; }
+    button.primary { background:#1f63d6; color:#fff; border-color:#1f63d6; }
+    .status { margin-top:10px; font-weight:700; color:#fff; }
+    .hint { margin-top:10px; color:#ccc; }
     .feedback .success { color: #0a6a0a; font-weight:700; }
     .feedback .error { color: #a00; font-weight:700; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Úkol 12 — Sestav tajenku z textu</h2>
+    <h2 style="color:white;">Úkol 12 — Sestav tajenku z textu</h2>
 
     <div class="meta">
       <div class="timer">Čas: <span id="timer">00:00:00</span></div>
-      <div>Progress: <span id="progress">0/12</span></div>
+      <div style="color:white;">Progress: <span id="progress">0/12</span></div>
     </div>
 
-
-    <label><strong>Text</strong></label>
+    <label style="color:white;"><strong>Text</strong></label>
     <div id="rendered" class="game-area" aria-label="Vykreslený text"></div>
-
 
     <div class="assembly">
       <label for="assembled"><strong>Tajenku napiš zde:</strong></label>
@@ -42,28 +40,31 @@
       <button id="clearAssemblyBtn">Vymazat</button>
       <button id="submitBtn" class="primary">Odeslat tajenku (zkontrolovat)</button>
     </div>
-</div>
+
     <p id="status" class="status"></p>
     <div id="feedback" class="feedback" aria-live="polite" style="margin-top:8px;"></div>
 
-    <p class="small" style="margin-top:12px;"></p>
+    <p class="small" style="margin-top:12px; color:#aaa;">(Používá společný script.js)</p>
   </div>
 
-  <!-- Hidden input used by checkAnswer in script.js (it reads #answer) -->
+  <!-- Hidden input used by checkAnswer in script.js -->
   <input type="hidden" id="answer" value="">
 
   <script>
     (function () {
       const TASK_NUMBER = 12;
-      // Hardcoded text and solution set in code:
-      const HARDCODED_TEXT = `Ve 20:45 se do pohybu dal policejní kordon stojící u Albatrosu a tlačil demonstranty proti druhému kordonu u Mikulandské. Pendreky mlátili sedící i stojící, a bylo jim jedno, zda je to chlapec nebo dívka, starší nebo mladý člověk. Lidé na ně volali: Gestapo. V davu vznikl velký tlak a lidé skoro nemohli dýchat, někteří ve snaze uniknout nebezpečí si lehali pod zaparkovaná auta. Zavládl zmatek, mnozí na jednom konci davu netušili, co se děje na opačné straně. 
-    Ve 20:53 dorazily ke kordonu u Mikulandské dva obrněné transportéry s drátěnými radlicemi, které přehradily Národní třídu a nahradily příslušníky školního oddílu SNB. Motory řvaly a světlomety nepříjemně oslňovaly demonstranty. Pocit ohrožení u lidí v davu se zvyšoval, propukla panika a hysterie. 
-      Studenti zoufale volali, aby je příslušníci nechali odejít. Zbytečně. Kordon od Albatrosu stále postupoval kupředu, přibližoval se druhému kordonu a studenty mezi sebou stále více stlačoval. Z davu příslušníci SNB vynášeli bezvládná těla těch, kteří v důsledku fyzického a psychického vypětí omdleli.`;
+
+      // Hardcoded text used in the task
+      const HARDCODED_TEXT = `Ve 20:45 se do pohybu dal policejní kordon stojící u Albatrosu a tlačil demonstranty proti druhému kordonu u Mikulandské. Pendreky mlátili sedící i stojící, a bylo jim jedno, zda je to chlapec nebo dívka, starší nebo mladý člověk. Lidé na ně volali: Gestapo. V davu vznikl velký tlak a lidé skoro nemohli dýchat, někteří ve snaze uniknout nebezpečí si lehali pod zaparkovaná auta. Zavládl zmatek, mnozí na jednom konci davu netušili, co se děje na opačné straně.
+Ve 20:53 dorazily ke kordonu u Mikulandské dva obrněné transportéry s drátěnými radlicemi, které přehradily Národní třídu a nahradily příslušníky školního oddílu SNB. Motory řvaly a světlomety nepříjemně oslňovaly demonstranty. Pocit ohrožení u lidí v davu se zvyšoval, propukla panika a hysterie.
+Studenti zoufale volali, aby je příslušníci nechali odejít. Zbytečně. Kordon od Albatrosu stále postupoval kupředu, přibližoval se druhému kordonu a studenty mezi sebou stále více stlačoval. Z davu příslušníci SNB vynášeli bezvládná těla těch, kteří v důsledku fyzického a psychického vypětí omdleli.`;
+
       const HARDCODED_SOLUTION = 'tajenka';
-      // Put the hardcoded text into the rendered area (in case HTML changed)
+
+      // Put text into the box
       document.getElementById('rendered').textContent = HARDCODED_TEXT;
 
-      // Store the solution in localStorage so je-li potřeba, je dostupné i jiným částem UI
+      // Save solution in localStorage (if other tasks need it)
       localStorage.setItem('solution_' + TASK_NUMBER, HARDCODED_SOLUTION);
 
       // Elements
@@ -72,34 +73,34 @@
       const backspaceBtn = document.getElementById('backspaceBtn');
       const clearAssemblyBtn = document.getElementById('clearAssemblyBtn');
       const feedback = document.getElementById('feedback');
-      
+
       // Assembly helpers
       backspaceBtn.addEventListener('click', () => {
         assembled.value = assembled.value.slice(0, -1);
       });
+
       clearAssemblyBtn.addEventListener('click', () => {
         assembled.value = '';
       });
 
-      // Submit: fill hidden #answer and call checkAnswer from script.js
+      // Submit solution
       submitBtn.addEventListener('click', () => {
         const userValue = assembled.value.trim();
         document.getElementById('answer').value = userValue;
 
-        // Ensure correct solution is taken from hardcoded value
         const correct = HARDCODED_SOLUTION;
-        const charsForStorage = correct; // uložíme celé řešení jako získané znaky
+        const charsForStorage = correct;
         const nextHint = '';
 
         if (typeof checkAnswer === 'function') {
           checkAnswer(TASK_NUMBER, correct, charsForStorage, nextHint);
           if (typeof updateProgress === 'function') updateProgress();
         } else {
-          feedback.innerHTML = '<div class="error">Chyba: funkce pro kontrolu odpovědi není dostupná.</div>';
+          feedback.innerHTML = '<div class="error">Chyba: funkce checkAnswer není dostupná.</div>';
         }
       });
 
-      // On load: ensure timer/progress UI are in correct state
+      // Update UI on load
       document.addEventListener('DOMContentLoaded', () => {
         if (typeof updateProgress === 'function') updateProgress();
         if (typeof updateTimer === 'function') updateTimer();
