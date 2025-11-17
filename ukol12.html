@@ -72,17 +72,7 @@
       const backspaceBtn = document.getElementById('backspaceBtn');
       const clearAssemblyBtn = document.getElementById('clearAssemblyBtn');
       const feedback = document.getElementById('feedback');
-
-      // Start timer using shared script.js
-      startTimerBtn.addEventListener('click', () => {
-        if (typeof startGame === 'function') {
-          startGame();
-          if (typeof updateTimer === 'function') updateTimer();
-        } else {
-          alert('Časomíra není dostupná (funkce startGame).');
-        }
-      });
-
+      
       // Assembly helpers
       backspaceBtn.addEventListener('click', () => {
         assembled.value = assembled.value.slice(0, -1);
