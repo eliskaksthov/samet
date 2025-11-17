@@ -8,25 +8,25 @@
   <script src="script.js" defer></script>
   <script src="highlightgame.js" defer></script>
   <style>
-    .container { max-width: 980px; margin:24px auto; padding:16px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .container { max-width: 980px; margin:24px auto; padding:16px; background:#00; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
     .row { display:flex; gap:12px; flex-wrap:wrap; }
     .col { flex:1; min-width:260px; }
     textarea { width:100%; height:140px; padding:8px; font-size:14px; }
     .controls { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
-    .game-area { border:1px solid #e0e0e0; padding:10px; border-radius:6px; min-height:140px; background:#fafafa; overflow:auto; white-space:pre-wrap; font-family:inherit; }
+    .game-area { border:1px solid #e0e0e0; padding:10px; border-radius:6px; min-height:140px; background:#00; overflow:auto; white-space:pre-wrap; font-family:inherit; }
     .char { display:inline-block; padding:2px 2px; margin:0; cursor:default; user-select:none; border-radius:3px; }
-    .char.highlight { background: #ffe58f; color:#000; box-shadow:0 1px 0 rgba(0,0,0,0.06) inset; }
+    .char.highlight { background: #ffe58f; color:#00; box-shadow:0 1px 0 rgba(0,0,0,0.06) inset; }
     .char.editable { cursor:pointer; border:1px dashed rgba(0,0,0,0.05); }
     .pool { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
-    .tile { padding:6px 8px; background:#fff; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-weight:600; }
+    .tile { padding:6px 8px; background:#00; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-weight:600; }
     .assembly { margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
     input[type="text"].assembled { padding:8px; min-width:240px; }
     .hint { margin-top:10px; font-size:0.95rem; color:#555; }
-    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#fff; cursor:pointer; }
-    button.primary { background:#2b7cff; color:#fff; border-color: #1f63d6; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#00; cursor:pointer; }
+    button.primary { background:#00; color:#fff; border-color: #1f63d6; }
     .status { margin-top:10px; font-weight:700; }
     .small { font-size:0.9rem; color:#666; }
-    .organizer { margin-top:12px; padding:8px; border-radius:6px; background:#fbfbfb; border:1px dashed #e6e6e6; }
+    .organizer { margin-top:12px; padding:8px; border-radius:6px; background:#00; border:1px dashed #e6e6e6; }
     label.block { display:block; margin-bottom:6px; font-weight:600; }
     .organizer-controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   </style>
@@ -34,7 +34,7 @@
 <body>
   <div class="container">
     <h2>Úkol 12 — Systémově zvýrazněná písmena</h2>
-    <p>Tento úkol používá předem nastavená zvýraznění. Pořadatel nastaví zvýrazněná písmena v "Režimu pořadatele". Hráči uvidí zvýraznění zamčené a mohou z nich skládat tajenku.</p>
+    <p>Tento úkol používá předem nastavená zvýraznění.  Hráči uvidí zvýraznění zamčené a mohou z nich skládat tajenku.</p>
 
     <div class="row">
       <div class="col">
