@@ -1,23 +1,98 @@
 <!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 12 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 12</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWER12', 'ukol13.html')">Odeslat</button>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Úkol 12 — Systémově zvýrazněná písmena</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <script src="highlightgame.js" defer></script>
+  <style>
+    .container { max-width: 980px; margin:24px auto; padding:16px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .row { display:flex; gap:12px; flex-wrap:wrap; }
+    .col { flex:1; min-width:260px; }
+    textarea { width:100%; height:140px; padding:8px; font-size:14px; }
+    .controls { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
+    .game-area { border:1px solid #e0e0e0; padding:10px; border-radius:6px; min-height:140px; background:#fafafa; overflow:auto; white-space:pre-wrap; font-family:inherit; }
+    .char { display:inline-block; padding:2px 2px; margin:0; cursor:default; user-select:none; border-radius:3px; }
+    .char.highlight { background: #ffe58f; color:#000; box-shadow:0 1px 0 rgba(0,0,0,0.06) inset; }
+    .char.editable { cursor:pointer; border:1px dashed rgba(0,0,0,0.05); }
+    .pool { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .tile { padding:6px 8px; background:#fff; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-weight:600; }
+    .assembly { margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    input[type="text"].assembled { padding:8px; min-width:240px; }
+    .hint { margin-top:10px; font-size:0.95rem; color:#555; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#fff; cursor:pointer; }
+    button.primary { background:#2b7cff; color:#fff; border-color: #1f63d6; }
+    .status { margin-top:10px; font-weight:700; }
+    .small { font-size:0.9rem; color:#666; }
+    .organizer { margin-top:12px; padding:8px; border-radius:6px; background:#fbfbfb; border:1px dashed #e6e6e6; }
+    label.block { display:block; margin-bottom:6px; font-weight:600; }
+    .organizer-controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Úkol 12 — Systémově zvýrazněná písmena</h2>
+    <p>Tento úkol používá předem nastavená zvýraznění. Pořadatel nastaví zvýrazněná písmena v "Režimu pořadatele". Hráči uvidí zvýraznění zamčené a mohou z nich skládat tajenku.</p>
+
+    <div class="row">
+      <div class="col">
+        <label for="inputText"><strong>Vložit text</strong></label>
+        <textarea id="inputText" placeholder="Sem vlož nebo nahraj soubor..."></textarea>
+        <div class="controls">
+          <input type="file" id="fileInput" accept=".txt">
+          <button id="renderBtn">Vykreslit text</button>
+          <button id="clearBtn">Vymazat text</button>
         </div>
-        <p id="feedback"></p>
-        <div class="footer">Správná odpověď (dočasná): <strong>ANSWER12</strong></div>
+        <p class="small">Pořadatel: po vložení textu zapněte "Režim pořadatele" a kliknutím označte písmena, která mají být zvýrazněná. Poté uložte zvýraznění.</p>
       </div>
-    </body>
-    </html>
+
+      <div class="col">
+        <label><strong>Text — hráč vidí pouze systémová zvýraznění</strong></label>
+        <div id="rendered" class="game-area" aria-label="Vykreslený text"></div>
+
+        <div class="hint">Pool ukazuje zvýrazněná písmena v pořadí, v jakém je pořadatel označil. Hráč klikne na písmeno v poolu pro přidání do tajenky.</div>
+
+        <div id="pool" class="pool" aria-label="Pool zvýrazněných písmen"></div>
+
+        <div class="assembly">
+          <label for="assembled"><strong>Tajenku sestav zde:</strong></label>
+          <input id="assembled" class="assembled" type="text" placeholder="Klikni na písmena v poolu nebo piš ručně">
+          <button id="backspaceBtn">← zpět</button>
+          <button id="clearAssemblyBtn">Vymazat</button>
+        </div>
+
+        <div class="controls" style="margin-top:8px;">
+          <button id="savePoolBtn">Uložit pool (interně)</button>
+          <button id="submitBtn" class="primary">Odeslat tajenku (zkontrolovat)</button>
+          <button id="resetHighlightsBtn">Reset zvýraznění</button>
+          <button id="wipeStorageBtn" title="Smaže interní stav modulu">Vymazat stav</button>
+        </div>
+
+        <p id="status" class="status"></p>
+
+        <div class="organizer">
+          <label class="block">Režim pořadatele (pouze pro organizátora)</label>
+          <div class="organizer-controls">
+            <button id="toggleOrganizerBtn">Zapnout režim pořadatele</button>
+            <button id="saveHighlightsBtn">Uložit zvýraznění</button>
+            <button id="exportHighlightsBtn" title="Zkopíruje JSON zvýraznění do schránky">Export do schránky</button>
+            <button id="importHighlightsBtn" title="Načíst JSON zvýraznění">Import (vložit JSON)</button>
+          </div>
+          <label class="block" style="margin-top:8px;">Pro pořadatele: nastavte očekávané řešení (lokálně)</label>
+          <div class="organizer-controls">
+            <input id="solutionInput" type="password" placeholder="Správné řešení (skryté)">
+            <button id="saveSolutionBtn">Uložit řešení</button>
+            <button id="clearSolutionBtn">Smazat řešení</button>
+          </div>
+          <div class="small" style="margin-top:8px;">Režim pořadatele povolí klikání pro úpravu zvýraznění. Pokud režim není zapnutý, hráči nemohou měnit zvýraznění.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="note">Kompatibilita: Po ověření se v localStorage uloží collectedChars objekt s klíčem "11" a do completedTasks se přidá číslo 11. updateProgress() zavoláme, pokud existuje.</p>
+  </div>
+</body>
+</html>
