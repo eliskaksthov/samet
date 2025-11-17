@@ -1,23 +1,92 @@
 <!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 11 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 11</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWER11', 'ukol12.html')">Odeslat</button>
-        </div>
-        <p id="feedback"></p>
-        <div class="footer">Správná odpověď (dočasná): <strong>ANSWER11</strong></div>
-      </div>
-    </body>
-    </html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Úkol 10 — Lov na klíče</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <script src="keygame.js" defer></script>
+  <style>
+    /* Místní styl pro hru; lze přesunout do style.css */
+    .container {
+      max-width: 800px;
+      margin: 24px auto;
+      padding: 16px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .game-area {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      background: linear-gradient(180deg,#fafafa,#f0f0f0);
+      margin-top: 12px;
+    }
+    .key-sprite {
+      position: absolute;
+      width: 48px;
+      height: 24px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.08s linear;
+      will-change: transform, opacity;
+      pointer-events: auto;
+    }
+    .hud {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .hud .panel {
+      padding:8px 12px;
+      background:#f7f7f7;
+      border-radius:6px;
+      border:1px solid #e2e2e2;
+      font-weight:600;
+    }
+    .controls { margin-top:12px; }
+    .result {
+      margin-top:12px;
+      font-size:1.05rem;
+      font-weight:700;
+    }
+    .hidden { display:none; }
+    button { cursor:pointer; padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Úkol 10 — Lov na klíče</h2>
+    <p>Za 60 sekund se ti náhodně objeví malé klíče. Každý klíč se zobrazí na 0,5 s — klikni na něj, aby sesbral(a) klíč. Pokud stihneš 100 klíčů do 60 sekund, úkol je splněný.</p>
+
+    <div class="hud">
+      <div class="panel">Zbývající čas: <span id="kg-time">01:00</span></div>
+      <div class="panel">Sesbírané klíče: <span id="kg-count">0</span>/100</div>
+      <div class="panel">Status: <span id="kg-status">Čeká</span></div>
+    </div>
+
+    <div class="game-area" id="kg-area" aria-label="Hrací plocha - zde se objevují klíče">
+      <!-- Klíče budou dynamicky vkládány sem -->
+    </div>
+
+    <div class="controls">
+      <button id="kg-start">Start</button>
+      <button id="kg-restart" class="hidden">Restart</button>
+      <button id="kg-reset-storage" title="Smaže interní stav této mini-hry (ne globálního progressu)">Vymazat stav</button>
+    </div>
+
+    <p id="kg-result" class="result"></p>
+
+    <p class="note">Poznámka: tento modul je kompatibilní se script.js — při úspěchu se doplní číslo úkolu (10) do localStorage.completedTasks a zavolá se updateProgress().</p>
+
+    <div class="footer">Po skončení hry se výsledek uloží místně. Správné dokončení přidá úkol č. 10 do tvého progressu.</div>
+  </div>
+</body>
+</html>
