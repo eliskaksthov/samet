@@ -89,20 +89,20 @@
       // řádek 5: 12 mezer
       {
         blanks: 12,
-        options: ['slovo1','slovo2','slovo3'],
-        correct: Array(12).fill('') // upravte
+        options: ['lidé','spojují','síla','zastavit','pro','je','dobro,','společné','žádná','Když','nemůže','se'],
+        correct: ['Když','se','lidé','spojují','pro','společné','dobro,','žádná','síla','je','nemůže','zastavit.'] // upravte
       },
       // řádek 6: 12 mezer
       {
         blanks: 12,
-        options: ['x','y','z'],
-        correct: Array(12).fill('') // upravte
+        options: ['činech.','Odvaha','rozhodnutích,','se','ne','malých','v','ve','velkých','projevuje','každodenních','jen'],
+        correct: ['Odvaha','se','projevuje','v','malých','každodenních','rozhodnutích,','ne','jen','ve','velkých','činech.'] // upravte
       },
       // řádek 7: 12 mezer
       {
         blanks: 12,
-        options: ['alpha','beta','gamma'],
-        correct: Array(12).fill('') // upravte
+        options: ['hodnotami.','síla','schopnosti','člověka','s','spočívá','Největší','vlastními','v','ve','jednat','souladu'],
+        correct: ['Největší','síla','člověka','spočívá','ve','schopnosti','jednat','v','souladu','s','vlastními','hodnotami.'] // upravte
       },
     ];
     // -------------------------------------------
@@ -111,7 +111,7 @@
 
     // další konfigurace
     const TASK_NUMBER = 8;           // číslo úkolu (nechte 8 pokud odpovídá ukol8.html)
-    const CHARS_FOR_TASK = '__';     // znak(y) které se uloží po splnění
+    const CHARS_FOR_TASK = 'AB';     // znak(y) které se uloží po splnění
 
     // pomocná normalizace (odstraní diakritiku, interpunkci; použito pro porovnání)
     function normalizeForCompare(s) {
