@@ -1,22 +1,138 @@
-<!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 11 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 11</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note"></p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWEAR11', 'ukol12.html')">Odeslat</button>
-        </div>
-        <p id="feedback"></p>
-      </div>
-    </body>
-    </html>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seškrabej cenzuru</title>
+
+<style>
+    body {
+        background: #111;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+    }
+
+    #wrapper {
+        position: relative;
+        width: 90%;
+        max-width: 500px;
+    }
+
+    #text {
+        font-size: 22px;
+        line-height: 1.4;
+        padding: 20px;
+        background: #222;
+        border-radius: 10px;
+        z-index: 1;
+        position: relative;
+    }
+
+    #scratch {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #000;
+        z-index: 2;
+        border-radius: 10px;
+        touch-action: none; /* důležité pro mobily */
+    }
+</style>
+
+</head>
+<body>
+
+<div id="wrapper">
+    <div id="text">
+        „Pravda a láska musí zvítězit nad lží a nenávistí.“
+    </div>
+    <canvas id="scratch"></canvas>
+</div>
+
+<audio id="breakSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c986a399a.mp3"></audio>
+
+<script>
+    const canvas = document.getElementById("scratch");
+    const ctx = canvas.getContext("2d");
+    const wrapper = document.getElementById("wrapper");
+    const breakSound = document.getElementById("breakSound");
+
+    function resizeCanvas() {
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        ctx.fillStyle = "#000"; // cenzura
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    let isDrawing = false;
+
+    function start(e) {
+        isDrawing = true;
+        draw(e);
+    }
+
+    function end() {
+        isDrawing = false;
+        ctx.beginPath();
+        checkReveal();
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+
+        let x, y;
+
+        if (e.touches) {
+            const rect = canvas.getBoundingClientRect();
+            x = e.touches[0].clientX - rect.left;
+            y = e.touches[0].clientY - rect.top;
+        } else {
+            x = e.offsetX;
+            y = e.offsetY;
+        }
+
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function checkReveal() {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let pixels = imageData.data;
+        let cleared = 0;
+
+        for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] === 0) cleared++; 
+        }
+
+        let percent = cleared / (pixels.length / 4);
+
+        if (percent > 0.9) {
+            canvas.style.transition = "opacity 0.5s";
+            canvas.style.opacity = 0;
+            breakSound.play();
+            setTimeout(() => canvas.remove(), 500);
+        }
+    }
+
+    canvas.addEventListener("mousedown", start);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", end);
+    canvas.addEventListener("mouseleave", end);
+
+    canvas.addEventListener("touchstart", start);
+    canvas.addEventListener("touchmove", draw);
+    canvas.addEventListener("touchend", end);
+</script>
+
+</body>
+</html>
