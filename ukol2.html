@@ -1,63 +1,107 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Úkol 2 — Sametová šifra</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-
-  <style>
-    /* Simple styles for the inserted image and feedback */
-    .task-figure {
-      margin: 14px 0;
-      text-align: center;
-    }
-    .task-image {
-      max-width: 100%;
-      height: auto;
-      display: inline-block;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
-    .task-caption {
-      font-size: 0.95rem;
-      color: #666;
-      margin-top: 6px;
-    }
-    #feedback {
-      font-weight: 600;
-      margin-top: 10px;
-    }
-    .feedback .success { color: #0a0; }
-    .feedback .error   { color: #c00; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Úkol 2 — Sametová šifra</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <style>
+        /* Task specific styles */
+        .task-figure {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .task-image {
+            max-width: 100%;
+            height: auto;
+            display: inline-block;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .task-caption {
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        #feedback {
+            font-weight: 600;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .feedback .success { 
+            color: #0a0;
+            background-color: rgba(0, 200, 0, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .feedback .error { 
+            color: #c00;
+            background-color: rgba(200, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .task-input {
+            margin: 20px 0;
+        }
+        .task-input input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .task-input button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .task-input button:hover {
+            background-color: #c0392b;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Úkol 2</h2>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1>ÚKOL 2</h1>
+                <p class="subtitle">Sametová revoluce</p>
+                <div class="divider"></div>
+            </div>
+        </header>
 
-    <!-- Obrázek úkolu: uložte do repozitáře např. images/ukol20.jpg a/nebo změňte src -->
-    <figure class="task-figure" aria-hidden="false">
-      <img src="images/ukol20.jpg" alt="Úkol 2 — šifra (ilustrační obrázek)" class="task-image" loading="lazy">
-      <figcaption class="task-caption">Tady šifra i obrázek.</figcaption>
-    </figure>
+        <main class="content">
+            <section class="task-content">
+                <figure class="task-figure" aria-hidden="false">
+                    <img src="images/ukol20.jpg" alt="Úkol 2 — šifra (ilustrační obrázek)" class="task-image" loading="lazy">
+                    <figcaption class="task-caption">Tady šifra i obrázek.</figcaption>
+                </figure>
 
-    <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-    <p class="note">Vyřeš šifru.</p>
+                <p class="task-instruction">Vyřeš šifru a zadej správnou odpověď:</p>
 
-    <!-- Input for player's answer -->
-    <input type="text" id="answer" placeholder="Zadejte odpověď">
+                <div class="task-input">
+                    <input type="text" id="answer" placeholder="Zadejte odpověď" autofocus>
+                    <button onclick="submitUkol20()">Odeslat odpověď</button>
+                </div>
 
-    <div style="margin-top:10px;">
-      <!-- Button calls a local wrapper (we DO NOT modify script.js) -->
-      <button onclick="submitUkol20()">Odeslat</button>
+                <div id="feedback" role="status" aria-live="polite"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Pravda a láska musí zvítězit nad lží a nenávistí</p>
+        </footer>
     </div>
-
-    <p id="feedback" role="status" aria-live="polite"></p>
-
-    <div class="footer">Správná odpověď (dočasná): <strong id="answer-reveal">********</strong></div>
-  </div>
 
   <script>
     // --- KONFIGURACE: zde nastavte očekávanou odpověď pro tento úkol (pouze v tomto souboru) ---
@@ -153,3 +197,9 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
