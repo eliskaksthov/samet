@@ -7,14 +7,14 @@
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
   <style>
-    .container { max-width: 880px; margin:24px auto; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); background:#fff; }
+    .container { max-width: 880px; margin:24px auto; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); background:#00; }
     .meta { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
     .timer { font-weight:700; }
-    .game-area { border:1px solid #e0e0e0; padding:12px; border-radius:6px; min-height:140px; overflow:auto; white-space:pre-wrap; font-family:inherit; background:#fafafa; }
+    .game-area { border:1px solid #ff; padding:12px; border-radius:6px; min-height:140px; overflow:auto; white-space:pre-wrap; font-family:inherit; background:#00; }
     .assembly { margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
     input[type="text"].assembled { padding:8px; min-width:260px; }
-    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#f5f5f5; cursor:pointer; }
-    button.primary { background:#1f63d6; color:#fff; border-color:#1f63d6; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#00; cursor:pointer; }
+    button.primary { background:#00; color:#fff; border-color:#1f63d6; }
     .status { margin-top:10px; font-weight:700; }
     .hint { margin-top:10px; color:#444; }
     .feedback .success { color: #0a6a0a; font-weight:700; }
@@ -27,7 +27,6 @@
 
     <div class="meta">
       <div class="timer">Čas: <span id="timer">00:00:00</span></div>
-      <div><button id="startTimerBtn">Spustit časomíru</button></div>
       <div>Progress: <span id="progress">0/12</span></div>
     </div>
 
