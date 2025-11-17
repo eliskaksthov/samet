@@ -1,23 +1,284 @@
 <!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 8 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 8</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWER8', 'ukol9.html')">Odeslat</button>
-        </div>
-        <p id="feedback"></p>
-        <div class="footer">Správná odpověď (dočasná): <strong>ANSWER8</strong></div>
-      </div>
-    </body>
-    </html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Úkol 8 — Citáty</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+
+  <style>
+    .container { max-width:900px; margin:18px auto; padding:12px; }
+    h2 { margin-bottom:6px; }
+    .line { margin: 12px 0; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .blanks { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .blank-select { min-width:120px; padding:6px; border-radius:6px; border:1px solid #ccc; background:#fff; }
+    .check-btn { padding:6px 10px; border-radius:6px; cursor:pointer; border:1px solid #1976d2; background:#1976d2; color:#fff; }
+    .check-btn[disabled] { opacity:0.5; cursor:default; }
+    .checkmark { color: #1b8e3a; font-weight:800; margin-left:8px; }
+    .hidden { display:none; }
+    .note { color:#444; margin-top:8px; }
+    .controls { margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .small { font-size:0.9rem; color:#666; }
+    #feedback { margin-top:12px; font-weight:700; }
+    .feedback.success { color:#0a0; }
+    .feedback.error { color:#c00; }
+    /* responsive */
+    @media (max-width:520px) {
+      .blank-select { min-width:80px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Citáty.</h2>
+    <p>Vyplň jednotlivé mezery výběrem slov z nabídky. Po správné kombinaci na řádku se objeví zelený šek a odemkne se další řádek.</p>
+
+    <!-- Lines container -->
+    <div id="quotes-wrapper">
+      <!-- Lines will be generated here by script -->
+    </div>
+
+    <div id="feedback" role="status" aria-live="polite"></div>
+
+    <div class="note">
+      Po dokončení všech řádků bude úkol označen jako splněný (uloženo do localStorage a updateProgress() bude zavoláno).<br>
+      Pokud chcete upravit nabídky slov nebo správné kombinace, najděte výrazně označenou část níže v sekci <strong>"SEKCE PRO ÚPRAVU"</strong>.
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------
+    // SEKCE PRO ÚPRAVU (ZDE upravte slovní nabídky a správné kombinace)
+    // -------------------------------------------
+    // Každý řádek je objekt { blanks: N, options: [...], correct: [...] }
+    // - blanks: počet prázdných míst v řádku
+    // - options: pole slov (řetězců), která budou v nabídce pro každé prázdné místo
+    //            (stejné možnosti se použijí pro všechna pole řádku)
+    // - correct: přesné hodnoty (pole délky 'blanks') které považujeme za správné
+    //
+    // POZNÁMKA: porovnání používá normalizaci (trim, odstranění diakritiky a interpunkce, velká písmena),
+    // takže můžete zadat hodnoty s či bez diakritiky.
+    //
+    // Upravit zde:
+    const LINES = [
+      // řádek 1: 9 mezer
+      {
+        blanks: 9,
+        options: ['VČERA','VCERA','BYLA','BYLI','SAMETOVA','SAMETNA','REVOLUCE','REVOLUCE.','REVOLUCE!','BYL'],
+        correct: ['VCERA','BYLA','SAMETOVA','REVOLUCE','','','','',''] // příklad: pokud řádek skutečně obsahuje 9 mezer, doplňte správné položky; prázdný řetězec = akceptuje libovolné (nebo změňte podle potřeby)
+      },
+      // řádek 2: 8 mezer
+      {
+        blanks: 8,
+        options: ['SLAVNOST','STALO','SE','NA','STAROMESTE','POD','HVĚZDOU','17.11.1989','17','11'],
+        correct: ['','','','','','','',''] // upravte
+      },
+      // řádek 3: 5 mezer
+      {
+        blanks: 5,
+        options: ['LIDE','PLAČI','SMICH','OSLAVA','TIŠE','HLASITĚ'],
+        correct: ['','','','',''] // upravte
+      },
+      // řádek 4: 11 mezer
+      {
+        blanks: 11,
+        options: ['A','B','C','D','E','F','G','H','I','J'],
+        correct: Array(11).fill('') // upravte
+      },
+      // řádek 5: 12 mezer
+      {
+        blanks: 12,
+        options: ['slovo1','slovo2','slovo3'],
+        correct: Array(12).fill('') // upravte
+      },
+      // řádek 6: 12 mezer
+      {
+        blanks: 12,
+        options: ['x','y','z'],
+        correct: Array(12).fill('') // upravte
+      },
+      // řádek 7: 12 mezer
+      {
+        blanks: 12,
+        options: ['alpha','beta','gamma'],
+        correct: Array(12).fill('') // upravte
+      },
+    ];
+    // -------------------------------------------
+    // Konec sekce pro úpravu
+    // -------------------------------------------
+
+    // další konfigurace
+    const TASK_NUMBER = 8;           // číslo úkolu (nechte 8 pokud odpovídá ukol8.html)
+    const CHARS_FOR_TASK = '__';     // znak(y) které se uloží po splnění
+
+    // pomocná normalizace (odstraní diakritiku, interpunkci; použito pro porovnání)
+    function normalizeForCompare(s) {
+      return String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z0-9 ]/ig, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toUpperCase();
+    }
+
+    // Vytvoření HTML pro řádky
+    function renderLines() {
+      const wrapper = document.getElementById('quotes-wrapper');
+      wrapper.innerHTML = '';
+      LINES.forEach((line, idx) => {
+        const lineEl = document.createElement('div');
+        lineEl.className = 'line';
+        lineEl.dataset.index = idx;
+
+        // id pro odkazování
+        const rowId = 'line-' + (idx+1);
+
+        // container blanks
+        const blanksContainer = document.createElement('div');
+        blanksContainer.className = 'blanks';
+        blanksContainer.id = rowId + '-blanks';
+
+        for (let i=0;i<line.blanks;i++) {
+          const sel = document.createElement('select');
+          sel.className = 'blank-select';
+          sel.dataset.pos = i;
+          sel.id = `${rowId}-sel-${i}`;
+
+          // prázdná volba
+          const emptyOpt = document.createElement('option');
+          emptyOpt.value = '';
+          emptyOpt.textContent = '---';
+          sel.appendChild(emptyOpt);
+
+          line.options.forEach(opt => {
+            const o = document.createElement('option');
+            o.value = opt;
+            o.textContent = opt;
+            sel.appendChild(o);
+          });
+
+          // pokud řádek není odemčený, zakážeme selects kromě prvního řádku
+          sel.disabled = (idx !== 0); // jen první řádek je aktivní na začátku
+          blanksContainer.appendChild(sel);
+        }
+
+        // tlačítko pro kontrolu tohoto řádku
+        const checkBtn = document.createElement('button');
+        checkBtn.className = 'check-btn';
+        checkBtn.id = rowId + '-check';
+        checkBtn.textContent = 'Zkontrolovat';
+        checkBtn.disabled = (idx !== 0); // jen pro aktivní řádek
+
+        // šek (zobrazí se při správném vyplnění)
+        const checkMark = document.createElement('span');
+        checkMark.className = 'checkmark hidden';
+        checkMark.id = rowId + '-ok';
+        checkMark.textContent = '✔';
+
+        // přidej do řádku
+        lineEl.appendChild(blanksContainer);
+        lineEl.appendChild(checkBtn);
+        lineEl.appendChild(checkMark);
+
+        wrapper.appendChild(lineEl);
+
+        // bind event
+        checkBtn.addEventListener('click', () => { checkLine(idx); });
+      });
+    }
+
+    // ověří jeden řádek
+    function checkLine(index) {
+      const line = LINES[index];
+      const rowId = 'line-' + (index+1);
+      const selects = Array.from(document.querySelectorAll('#' + rowId + '-blanks select'));
+      const chosen = selects.map(s => s.value || '');
+      const feedback = document.getElementById('feedback');
+
+      // Porovnání: pokud v 'correct' pole je prázdný string, interpretujeme to jako "akceptuj cokoliv" pro danou pozici.
+      let ok = true;
+      for (let i=0;i<line.blanks;i++) {
+        const expected = (line.correct && line.correct[i] !== undefined) ? line.correct[i] : '';
+        if (expected === '') {
+          // akceptujeme cokoliv (ale pokud chcete, můžete to zrušit a udělat přesnou kontrolu)
+          continue;
+        }
+        if (normalizeForCompare(chosen[i]) !== normalizeForCompare(expected)) {
+          ok = false; break;
+        }
+      }
+
+      if (ok) {
+        // zobrazit checkmark
+        document.getElementById(rowId + '-ok').classList.remove('hidden');
+        document.getElementById(rowId + '-check').disabled = true;
+
+        // deaktivovat selects v tomto řádku (ponecháme hodnoty)
+        selects.forEach(s => { s.disabled = true; });
+
+        // odemknout další řádek (pokud existuje)
+        const nextIndex = index + 1;
+        if (nextIndex < LINES.length) {
+          // enable selects a check tlačítko u dalšího řádku
+          const nextSelects = Array.from(document.querySelectorAll('#line-' + (nextIndex+1) + '-blanks select'));
+          nextSelects.forEach(s => { s.disabled = false; });
+          document.getElementById('line-' + (nextIndex+1) + '-check').disabled = false;
+          feedback.textContent = '';
+          feedback.className = '';
+        } else {
+          // poslední řádek správně - úkol hotov
+          feedback.textContent = 'Gratuluji — všech 7 řádků vyplněno správně!';
+          feedback.className = 'feedback success';
+          // označíme úkol jako splněný (uložení kompatibilní se script.js)
+          quotes_markTaskComplete();
+        }
+      } else {
+        feedback.textContent = 'Nesprávně — zkuste to znovu na tomto řádku.';
+        feedback.className = 'feedback error';
+      }
+    }
+
+    // uloží do localStorage (kompatibilně se script.js)
+    function quotes_markTaskComplete() {
+      const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+      if (!completed.includes(TASK_NUMBER)) {
+        completed.push(TASK_NUMBER);
+        localStorage.setItem('completedTasks', JSON.stringify(completed));
+      }
+      const collectedChars = JSON.parse(localStorage.getItem('collectedChars') || '{}');
+      collectedChars[TASK_NUMBER] = CHARS_FOR_TASK;
+      localStorage.setItem('collectedChars', JSON.stringify(collectedChars));
+
+      // zavolat updateProgress pokud je k dispozici ve script.js
+      if (typeof updateProgress === 'function') {
+        try { updateProgress(); } catch (e) { console.warn('updateProgress() selhalo', e); }
+      }
+    }
+
+    // init
+    document.addEventListener('DOMContentLoaded', () => {
+      renderLines();
+      // pokud byl úkol už splněn dříve, zobrazíme jako splněný
+      const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+      if (completed.includes(TASK_NUMBER)) {
+        // nastavit všechny řádky jako hotové (vizuálně)
+        for (let i=0;i<LINES.length;i++) {
+          const rowId = 'line-' + (i+1);
+          const selects = Array.from(document.querySelectorAll('#' + rowId + '-blanks select'));
+          selects.forEach(s => { s.disabled = true; });
+          const checkBtn = document.getElementById(rowId + '-check');
+          if (checkBtn) checkBtn.disabled = true;
+          const ok = document.getElementById(rowId + '-ok');
+          if (ok) ok.classList.remove('hidden');
+        }
+        const fb = document.getElementById('feedback');
+        fb.textContent = 'Tento úkol byl již dříve splněn.';
+        fb.className = 'feedback success';
+      }
+    });
+  </script>
+</body>
+</html>
