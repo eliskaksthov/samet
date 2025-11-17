@@ -40,7 +40,7 @@
     <!-- Obrázek úkolu: uložte do repozitáře např. images/ukol20.jpg a/nebo změňte src -->
     <figure class="task-figure" aria-hidden="false">
       <img src="images/ukol20.jpg" alt="Úkol 20 — šifra (ilustrační obrázek)" class="task-image" loading="lazy">
-      <figcaption class="task-caption">Nápověda a šifra (uložte obrázek do images/ukol20.jpg nebo změňte src).</figcaption>
+      <figcaption class="task-caption">Tady šifra i obrázek.</figcaption>
     </figure>
 
     <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
@@ -88,7 +88,7 @@
     // - uloží completedTasks a collectedChars do localStorage
     // - zavolá updateProgress() (funkce je v script.js, takže ji můžeme použít)
     // - přesměruje na další stránku, pokud je odpověď správná
-    function submitUkol20(next = 'ukol3.html') {
+    function submitUkol20() {
       const inputEl = document.getElementById('answer');
       const feedbackEl = document.getElementById('feedback');
       const userRaw = (inputEl.value || '');
