@@ -1,138 +1,261 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seškrabej cenzuru</title>
+import React, { useState, useRef, useEffect } from 'react';
 
-<style>
-    body {
-        background: #111;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 20px;
+const ScratchGame = () => {
+  const quotes = [
+    {
+      text: "Pravda a láska musí zvítězit nad lží a nenávistí.",
+      author: "— Václav Havel",
+      category: "Pravda"
+    },
+    {
+      text: "Svoboda se nedává, svobodu si člověk musí získat.",
+      author: "— Tomáš Garrigue Masaryk",
+      category: "Svoboda"
+    },
+    {
+      text: "Demokracie není stav, ale proces.",
+      author: "— Václav Havel",
+      category: "Demokracie"
+    },
+    {
+      text: "Lidé, kteří chtějí svobodu, jsou lidé, kteří jsou ochotni nést odpovědnost.",
+      author: "— Václav Havel",
+      category: "Odpovědnost"
+    },
+    {
+      text: "Když se lidé spojují pro společné dobro, žádná síla je nemůže zastavit.",
+      author: "— Václav Havel",
+      category: "Jednota"
+    },
+    {
+      text: "Odvaha se projevuje v malých každodenních rozhodnutích, ne jen ve velkých činech.",
+      author: "— Václav Havel",
+      category: "Odvaha"
+    },
+    {
+      text: "Největší síla člověka spočívá ve schopnosti jednat v souladu s vlastními hodnotami.",
+      author: "— Václav Havel",
+      category: "Hodnoty"
+    }
+  ];
+
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  const currentQuote = quotes[currentQuoteIndex];
+
+  useEffect(() => {
+    initCanvas();
+  }, [currentQuoteIndex]);
+
+  const initCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    // Černá cenzura s více vrstvami
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Vrstva 1 - tmavě šedá
+    ctx.fillStyle = '#1a1a1a';
+    for (let i = 0; i < 100; i++) {
+      ctx.fillRect(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        Math.random() * 5 + 2,
+        Math.random() * 5 + 2
+      );
     }
 
-    #wrapper {
-        position: relative;
-        width: 90%;
-        max-width: 500px;
+    // Vrstva 2 - střední šedá
+    ctx.fillStyle = '#333333';
+    for (let i = 0; i < 80; i++) {
+      ctx.fillRect(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        Math.random() * 4 + 1,
+        Math.random() * 4 + 1
+      );
     }
 
-    #text {
-        font-size: 22px;
-        line-height: 1.4;
-        padding: 20px;
-        background: #222;
-        border-radius: 10px;
-        z-index: 1;
-        position: relative;
+    // Vrstva 3 - světlejší textura
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    for (let i = 0; i < 60; i++) {
+      ctx.fillRect(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        Math.random() * 3,
+        Math.random() * 3
+      );
     }
 
-    #scratch {
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: #000;
-        z-index: 2;
-        border-radius: 10px;
-        touch-action: none; /* důležité pro mobily */
+    setProgress(0);
+    setIsRevealed(false);
+    setShowSuccess(false);
+  };
+
+  const scratch = (x, y) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const posX = (x - rect.left) * scaleX;
+    const posY = (y - rect.top) * scaleY;
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(posX, posY, 30, 0, Math.PI * 2);
+    ctx.fill();
+
+    calculateProgress();
+  };
+
+  const handleMouseDown = (e) => {
+    setIsDrawing(true);
+    scratch(e.clientX, e.clientY);
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDrawing) {
+      scratch(e.clientX, e.clientY);
     }
-</style>
+  };
 
-</head>
-<body>
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+  };
 
-<div id="wrapper">
-    <div id="text">
-        „Pravda a láska musí zvítězit nad lží a nenávistí.“
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    setIsDrawing(true);
+    const touch = e.touches[0];
+    scratch(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+    if (isDrawing) {
+      const touch = e.touches[0];
+      scratch(touch.clientX, touch.clientY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDrawing(false);
+  };
+
+  const calculateProgress = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+
+    let transparent = 0;
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] < 128) transparent++;
+    }
+
+    const percent = Math.round((transparent / (pixels.length / 4)) * 100);
+    setProgress(percent);
+
+    if (percent > 90 && !isRevealed) {
+      setIsRevealed(true);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        nextQuote();
+      }, 2000);
+    }
+  };
+
+  const resetCanvas = () => {
+    initCanvas();
+  };
+
+  const nextQuote = () => {
+    setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-5">
+      <div className="max-w-4xl w-full">
+        <div className="text-center text-white mb-8">
+          <h1 className="text-5xl font-bold mb-3 drop-shadow-lg">🕊️ Seškrabej cenzuru</h1>
+          <p className="text-xl opacity-90">Přejeď myší nebo prstem přes černou cenzuru a odhal skryté citáty</p>
+        </div>
+
+        <div className="bg-white rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+          <span className="inline-block bg-red-500 text-white px-4 py-1 rounded-full text-sm mb-4">
+            {currentQuote.category}
+          </span>
+
+          <div className="relative min-h-[250px] flex items-center justify-center">
+            <div className="text-center px-5 py-8">
+              <p className="text-3xl leading-relaxed text-gray-800 mb-5">
+                {currentQuote.text}
+              </p>
+              <p className="text-xl text-gray-500 italic">
+                {currentQuote.author}
+              </p>
+            </div>
+
+            <canvas
+              ref={canvasRef}
+              className="absolute top-0 left-0 w-full h-full cursor-grab active:cursor-grabbing"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            />
+
+            {showSuccess && (
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-12 py-8 rounded-2xl text-3xl font-bold shadow-2xl z-20 animate-bounce">
+                🎉 Odhaleno!
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8">
+            <div className="bg-gray-200 h-5 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-center mt-2 text-gray-600 text-sm">
+              Odkryto: {progress}%
+            </p>
+          </div>
+
+          <div className="flex gap-4 mt-6 justify-center flex-wrap">
+            <button
+              onClick={resetCanvas}
+              className="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-3 rounded-full font-medium shadow-lg hover:scale-105 transform transition"
+            >
+              🔄 Zkusit znovu
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <canvas id="scratch"></canvas>
-</div>
+  );
+};
 
-<audio id="breakSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c986a399a.mp3"></audio>
-
-<script>
-    const canvas = document.getElementById("scratch");
-    const ctx = canvas.getContext("2d");
-    const wrapper = document.getElementById("wrapper");
-    const breakSound = document.getElementById("breakSound");
-
-    function resizeCanvas() {
-        canvas.width = wrapper.clientWidth;
-        canvas.height = wrapper.clientHeight;
-        ctx.fillStyle = "#000"; // cenzura
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
-    let isDrawing = false;
-
-    function start(e) {
-        isDrawing = true;
-        draw(e);
-    }
-
-    function end() {
-        isDrawing = false;
-        ctx.beginPath();
-        checkReveal();
-    }
-
-    function draw(e) {
-        if (!isDrawing) return;
-
-        let x, y;
-
-        if (e.touches) {
-            const rect = canvas.getBoundingClientRect();
-            x = e.touches[0].clientX - rect.left;
-            y = e.touches[0].clientY - rect.top;
-        } else {
-            x = e.offsetX;
-            y = e.offsetY;
-        }
-
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.beginPath();
-        ctx.arc(x, y, 25, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    function checkReveal() {
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        let pixels = imageData.data;
-        let cleared = 0;
-
-        for (let i = 3; i < pixels.length; i += 4) {
-            if (pixels[i] === 0) cleared++; 
-        }
-
-        let percent = cleared / (pixels.length / 4);
-
-        if (percent > 0.9) {
-            canvas.style.transition = "opacity 0.5s";
-            canvas.style.opacity = 0;
-            breakSound.play();
-            setTimeout(() => canvas.remove(), 500);
-        }
-    }
-
-    canvas.addEventListener("mousedown", start);
-    canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("mouseup", end);
-    canvas.addEventListener("mouseleave", end);
-
-    canvas.addEventListener("touchstart", start);
-    canvas.addEventListener("touchmove", draw);
-    canvas.addEventListener("touchend", end);
-</script>
-
-</body>
-</html>
+export default ScratchGame;
