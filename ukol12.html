@@ -3,287 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Úkol 12 — Systémově zvýrazněná písmena</title>
+  <title>Úkol 12 — Systémově zvýrazněná písmena (jednoduché)</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
-  <script src="highlightgame.js" defer></script>
   <style>
-    .container { max-width: 980px; margin:24px auto; padding:16px; background:#00; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-    .row { display:flex; gap:12px; flex-wrap:wrap; }
-    .col { flex:1; min-width:260px; }
-    textarea { width:100%; height:140px; padding:8px; font-size:14px; }
-    .controls { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
-    .game-area { border:1px solid #e0e0e0; padding:10px; border-radius:6px; min-height:140px; background:#00; overflow:auto; white-space:pre-wrap; font-family:inherit; }
-    .char { display:inline-block; padding:2px 2px; margin:0; cursor:default; user-select:none; border-radius:3px; }
-    .char.highlight { background: #ffe58f; color:#00; box-shadow:0 1px 0 rgba(0,0,0,0.06) inset; }
-    .char.editable { cursor:pointer; border:1px dashed rgba(0,0,0,0.05); }
-    .pool { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
-    .tile { padding:6px 8px; background:#00; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-weight:600; }
-    .assembly { margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    input[type="text"].assembled { padding:8px; min-width:240px; }
-    .hint { margin-top:10px; font-size:0.95rem; color:#555; }
-    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#00; cursor:pointer; }
-    button.primary { background:#00; color:#fff; border-color: #1f63d6; }
-    .status { margin-top:10px; font-weight:700; }
-    .small { font-size:0.9rem; color:#666; }
-    .organizer { margin-top:12px; padding:8px; border-radius:6px; background:#00; border:1px dashed #e6e6e6; }
-    label.block { display:block; margin-bottom:6px; font-weight:600; }
-    .organizer-controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    /* Simple styles to make timer and progress visible */
-    .meta { display:flex; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    .container { max-width: 880px; margin:24px auto; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); background:#fff; }
+    .meta { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
     .timer { font-weight:700; }
-    /* Hide UI meant for organizers by default for players */
-    .organizer-hidden { display:none !important; }
+    .game-area { border:1px solid #e0e0e0; padding:12px; border-radius:6px; min-height:140px; overflow:auto; white-space:pre-wrap; font-family:inherit; background:#fafafa; }
+    .assembly { margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    input[type="text"].assembled { padding:8px; min-width:260px; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #cfcfcf; background:#f5f5f5; cursor:pointer; }
+    button.primary { background:#1f63d6; color:#fff; border-color:#1f63d6; }
+    .status { margin-top:10px; font-weight:700; }
+    .hint { margin-top:10px; color:#444; }
+    .feedback .success { color: #0a6a0a; font-weight:700; }
+    .feedback .error { color: #a00; font-weight:700; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Úkol 12 — Systémově zvýrazněná písmena</h2>
+    <h2>Úkol 12 — Sestav tajenku z textu</h2>
 
-    <!-- Timer and progress (script.js expects #timer and #progress) -->
     <div class="meta">
       <div class="timer">Čas: <span id="timer">00:00:00</span></div>
+      <div><button id="startTimerBtn">Spustit časomíru</button></div>
       <div>Progress: <span id="progress">0/12</span></div>
     </div>
 
-    <p>Tento úkol: hráč vidí text a z něj vyplní tajenku. Po kliknutí na "Odeslat tajenku" bude odpověď zkontrolována pomocí společného script.js (nebyl upravován).</p>
+    <p>Hráč vidí text níže a z něj vyplní tajenku. Vše je nastaveno přímo v kódu — žádný režim pořadatele ani vymazávání zvýraznění.</p>
 
-    <div class="row">
-      <!-- Left column (organizer tools). Hidden by default for players. Toggle with "Režim pořadatele". -->
-      <div class="col organizer-area organizer-hidden">
-        <label for="inputText"><strong>Vložit text (pořadatel)</strong></label>
-        <textarea id="inputText" placeholder="Sem vlož nebo nahraj soubor..."></textarea>
-        <div class="controls">
-          <input type="file" id="fileInput" accept=".txt">
-          <button id="renderBtn">Vykreslit text</button>
-          <button id="clearBtn">Vymazat text</button>
-        </div>
-        <p class="small">Pořadatel: po vložení textu zapněte "Režim pořadatele" a označte písmena, která mají být zvýrazněná. Poté uložte zvýraznění nebo exportujte JSON.</p>
-      </div>
-
-      <!-- Right column (player view) -->
-      <div class="col">
-        <label><strong>Text — hráč vidí celý text</strong></label>
-        <div id="rendered" class="game-area" aria-label="Vykreslený text"></div>
-
-        <!-- We intentionally hide the pool UI from players by default to keep the interface simple.
-             Organizer can toggle its visibility. -->
-        <div id="pool" class="pool organizer-area organizer-hidden" aria-label="Pool zvýrazněných písmen"></div>
-
-        <div class="hint">Vyplň tajenku do políčka níže a klikni na "Odeslat tajenku". Pořadatel může nastavit správné řešení (lokálně) v režimu pořadatele.</div>
-
-        <div class="assembly">
-          <label for="assembled"><strong>Tajenku sestav zde:</strong></label>
-          <input id="assembled" class="assembled" type="text" placeholder="Napiš řešení">
-          <button id="backspaceBtn" title="Smaže poslední znak">← zpět</button>
-          <button id="clearAssemblyBtn">Vymazat</button>
-        </div>
-
-        <div class="controls" style="margin-top:8px;">
-          <button id="submitBtn" class="primary">Odeslat tajenku (zkontrolovat)</button>
-        </div>
-
-        <p id="status" class="status"></p>
-        <div id="feedback" class="feedback" aria-live="polite" style="margin-top:8px;"></div>
-
-        <div class="organizer organizer-area organizer-hidden">
-          <label class="block">Režim pořadatele (pouze pro organizátora)</label>
-          <div class="organizer-controls">
-            <button id="toggleOrganizerBtn">Zapnout / vypnout režim pořadatele</button>
-            <button id="saveHighlightsBtn">Uložit zvýraznění</button>
-            <button id="exportHighlightsBtn" title="Zkopíruje JSON zvýraznění do schránky">Export do schránky</button>
-            <button id="importHighlightsBtn" title="Načíst JSON zvýraznění">Import (vložit JSON)</button>
-          </div>
-          <label class="block" style="margin-top:8px;">Pro pořadatele: nastavte očekávané řešení (lokálně)</label>
-          <div class="organizer-controls">
-            <input id="solutionInput" type="password" placeholder="Správné řešení (skryté)">
-            <button id="saveSolutionBtn">Uložit řešení</button>
-            <button id="clearSolutionBtn">Smazat řešení</button>
-          </div>
-          <div class="small" style="margin-top:8px;">Režim pořadatele povolí klikání pro úpravu zvýraznění a ukáže nástroje vlevo. Pokud režim není zapnutý, hráči neuvidí tyto ovládací prvky.</div>
-        </div>
-
-      </div>
+    <label><strong>Text</strong></label>
+    <div id="rendered" class="game-area" aria-label="Vykreslený text">
+      VLOŽ TEKST SEM — tento text je přímo ve stránce a slouží jako zdroj pro hráče.
+      Zkus najít slovo, které tvoří tajenku.
+      (Toto pole je statické — není možné zvýrazňovat ani upravovat.)
     </div>
 
-    <p class="note">Kompatibilita: Po ověření se v localStorage uloží collectedChars objekt s klíčem "12" a do completedTasks se přidá číslo 12. updateProgress() zavoláme, pokud existuje.</p>
+    <div class="hint">Napiš řešení do pole níže a klikni na "Odeslat tajenku". Čas si spusť tlačítkem "Spustit časomíru".</div>
+
+    <div class="assembly">
+      <label for="assembled"><strong>Tajenku napiš zde:</strong></label>
+      <input id="assembled" class="assembled" type="text" placeholder="Napiš řešení">
+      <button id="backspaceBtn" title="Smaže poslední znak">← zpět</button>
+      <button id="clearAssemblyBtn">Vymazat</button>
+      <button id="submitBtn" class="primary">Odeslat tajenku (zkontrolovat)</button>
+    </div>
+
+    <p id="status" class="status"></p>
+    <div id="feedback" class="feedback" aria-live="polite" style="margin-top:8px;"></div>
+
+    <p class="small" style="margin-top:12px;">Poznámka: stránka používá společný script.js pro časomíru a kontrolu odpovědi — ten nebyl upravován.</p>
   </div>
 
   <!-- Hidden input used by checkAnswer in script.js (it reads #answer) -->
   <input type="hidden" id="answer" value="">
 
   <script>
-    // Local in-page glue code to integrate the page with existing script.js without changing it.
     (function () {
-      const TASK_NUMBER = 12; // číslo úkolu použité při ukládání do localStorage (completedTasks, collectedChars)
-      const rendered = document.getElementById('rendered');
+      const TASK_NUMBER = 12;
+      // Hardcoded text and solution set in code:
+      const HARDCODED_TEXT = `VLOŽ TEKST SEM — tento text je přímo ve stránce a slouží jako zdroj pro hráče.
+Zkus najít slovo, které tvoří tajenku.`;
+      const HARDCODED_SOLUTION = 'tajenka'; // <- sem vlož správné řešení
+
+      // Put the hardcoded text into the rendered area (in case HTML changed)
+      document.getElementById('rendered').textContent = HARDCODED_TEXT;
+
+      // Store the solution in localStorage so je-li potřeba, je dostupné i jiným částem UI
+      localStorage.setItem('solution_' + TASK_NUMBER, HARDCODED_SOLUTION);
+
+      // Elements
+      const startTimerBtn = document.getElementById('startTimerBtn');
       const assembled = document.getElementById('assembled');
       const submitBtn = document.getElementById('submitBtn');
-      const startTimerBtn = document.getElementById('startTimerBtn');
-      const fileInput = document.getElementById('fileInput');
-      const renderBtn = document.getElementById('renderBtn');
-      const clearBtn = document.getElementById('clearBtn');
       const backspaceBtn = document.getElementById('backspaceBtn');
       const clearAssemblyBtn = document.getElementById('clearAssemblyBtn');
-      const solutionInput = document.getElementById('solutionInput');
-      const saveSolutionBtn = document.getElementById('saveSolutionBtn');
-      const clearSolutionBtn = document.getElementById('clearSolutionBtn');
-      const toggleOrganizerBtn = document.getElementById('toggleOrganizerBtn');
-      const organizerAreas = document.querySelectorAll('.organizer-area');
-      const leftOrganizerColumn = document.querySelector('.row .col');
+      const feedback = document.getElementById('feedback');
 
-      // Hide organizer UI by default for players
-      function setOrganizerVisible(visible) {
-        organizerAreas.forEach(el => {
-          el.style.display = visible ? '' : 'none';
-        });
-        // left column is first .col element; keep it visible only for organizer
-        if (leftOrganizerColumn) {
-          // the left column contains organizer-specific input; hide for players
-          if (visible) leftOrganizerColumn.style.display = '';
-          else leftOrganizerColumn.style.display = 'none';
-        }
-      }
-      setOrganizerVisible(false);
-
-      // Start timer using function from script.js
+      // Start timer using shared script.js
       startTimerBtn.addEventListener('click', () => {
         if (typeof startGame === 'function') {
           startGame();
-          // updateTimer() in script.js will pick up #timer and start interval (it's called on DOMContentLoaded,
-          // but starting again is harmless). Call it to ensure timer is active immediately.
           if (typeof updateTimer === 'function') updateTimer();
         } else {
-          alert('Funkce startGame není dostupná.');
+          alert('Časomíra není dostupná (funkce startGame).');
         }
       });
 
-      // Small helpers for rendered text
-      function setRenderedText(text) {
-        // Show plain text in rendered area; preserve whitespace
-        rendered.textContent = text;
-      }
-
-      // File loading
-      if (fileInput) {
-        fileInput.addEventListener('change', (ev) => {
-          const f = ev.target.files && ev.target.files[0];
-          if (!f) return;
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const text = e.target.result;
-            document.getElementById('inputText').value = text;
-            setRenderedText(text);
-          };
-          reader.readAsText(f, 'utf-8');
-        });
-      }
-
-      // Render button (organizer)
-      if (renderBtn) {
-        renderBtn.addEventListener('click', () => {
-          const txt = document.getElementById('inputText').value || '';
-          setRenderedText(txt);
-        });
-      }
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-          document.getElementById('inputText').value = '';
-          setRenderedText('');
-        });
-      }
-
       // Assembly helpers
-      if (backspaceBtn) {
-        backspaceBtn.addEventListener('click', () => {
-          assembled.value = assembled.value.slice(0, -1);
-        });
-      }
-      if (clearAssemblyBtn) {
-        clearAssemblyBtn.addEventListener('click', () => {
-          assembled.value = '';
-        });
-      }
+      backspaceBtn.addEventListener('click', () => {
+        assembled.value = assembled.value.slice(0, -1);
+      });
+      clearAssemblyBtn.addEventListener('click', () => {
+        assembled.value = '';
+      });
 
-      // Organizer: save / clear solution locally
-      if (saveSolutionBtn) {
-        saveSolutionBtn.addEventListener('click', () => {
-          const sol = solutionInput.value.trim();
-          if (!sol) {
-            alert('Zadej řešení do pole.');
-            return;
-          }
-          localStorage.setItem('solution_' + TASK_NUMBER, sol);
-          alert('Řešení bylo uloženo lokálně.');
-        });
-      }
-      if (clearSolutionBtn) {
-        clearSolutionBtn.addEventListener('click', () => {
-          localStorage.removeItem('solution_' + TASK_NUMBER);
-          alert('Řešení bylo smazáno.');
-        });
-      }
+      // Submit: fill hidden #answer and call checkAnswer from script.js
+      submitBtn.addEventListener('click', () => {
+        const userValue = assembled.value.trim();
+        document.getElementById('answer').value = userValue;
 
-      // Toggle organizer UI visibility
-      if (toggleOrganizerBtn) {
-        toggleOrganizerBtn.addEventListener('click', () => {
-          // toggle based on one element's current display
-          const currentlyHidden = organizerAreas.length && organizerAreas[0].style.display === 'none';
-          setOrganizerVisible(currentlyHidden);
-        });
-      }
+        // Ensure correct solution is taken from hardcoded value
+        const correct = HARDCODED_SOLUTION;
+        const charsForStorage = correct; // uložíme celé řešení jako získané znaky
+        const nextHint = '';
 
-      // When player clicks submit, we fill #answer (script.js reads it) and call checkAnswer.
-      if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
-          const userValue = assembled.value.trim();
-          // Put the value into the hidden #answer field so checkAnswer can read it
-          const answerField = document.getElementById('answer');
-          answerField.value = userValue;
-
-          // Retrieve correct solution from localStorage (set by organizer) or ask organizer to set it
-          const correct = localStorage.getItem('solution_' + TASK_NUMBER);
-          if (!correct) {
-            // If there's no stored solution, show an inline message
-            const fb = document.getElementById('feedback');
-            fb.innerHTML = '<div class="error">❗ Správné řešení není nastaveno. Pořadatel musí uložit řešení v režimu pořadatele.</div>';
-            return;
-          }
-
-          // For 'chars' parameter, we store the solution itself so collectedChars will record it.
-          const charsForStorage = correct;
-
-          // nextHint can be empty for now
-          const nextHint = '';
-
-          if (typeof checkAnswer === 'function') {
-            // call global checkAnswer defined in script.js
-            checkAnswer(TASK_NUMBER, correct, charsForStorage, nextHint);
-            // update progress display (script.js exposes updateProgress)
-            if (typeof updateProgress === 'function') updateProgress();
-          } else {
-            alert('Funkce checkAnswer není dostupná.');
-          }
-        });
-      }
-
-      // On load: if inputText has value, render it
-      document.addEventListener('DOMContentLoaded', () => {
-        const initial = document.getElementById('inputText').value;
-        if (initial) setRenderedText(initial);
-
-        // Show stored solution in organizer input if present (hidden for players)
-        const storedSolution = localStorage.getItem('solution_' + TASK_NUMBER);
-        if (storedSolution && solutionInput) {
-          solutionInput.value = storedSolution;
+        if (typeof checkAnswer === 'function') {
+          checkAnswer(TASK_NUMBER, correct, charsForStorage, nextHint);
+          if (typeof updateProgress === 'function') updateProgress();
+        } else {
+          feedback.innerHTML = '<div class="error">Chyba: funkce pro kontrolu odpovědi není dostupná.</div>';
         }
+      });
 
-        // Ensure progress and timer are picked up by script.js (updateTimer and updateProgress are invoked
-        // by script.js on DOMContentLoaded, but call updateProgress again to be safe).
+      // On load: ensure timer/progress UI are in correct state
+      document.addEventListener('DOMContentLoaded', () => {
         if (typeof updateProgress === 'function') updateProgress();
         if (typeof updateTimer === 'function') updateTimer();
       });
-
     })();
   </script>
 </body>
