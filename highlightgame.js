@@ -4,12 +4,12 @@
 // Nezasahuje do script.js; pouze volá updateProgress(), pokud existuje.
 
 (function () {
-  const TASK_NUM = 11;
+  const TASK_NUM = 12;
   const STORAGE_KEYS = {
-    rawText: 'ukol11_rawText',
-    highlights: 'ukol11_highlights',       // array of positions {idx, char}
-    poolOrder: 'ukol11_poolOrder',         // array of indices into highlights
-    assembled: 'ukol11_assembled'
+    rawText: 'ukol12_rawText',
+    highlights: 'ukol12_highlights',       // array of positions {idx, char}
+    poolOrder: 'ukol12_poolOrder',         // array of indices into highlights
+    assembled: 'ukol12_assembled'
   };
 
   // DOM
