@@ -192,7 +192,7 @@
     stopSpawning();
     setRunning(false);
     updateHUD();
-    resultEl.textContent = '🎉 Úspěch! Sesbíral(a) jsi 100 klíčů.';
+    resultEl.textContent = '🎉 Úspěch! Sesbíral(a) jsi 89 klíčů.';
     startBtn.disabled = false;
     restartBtn.classList.add('hidden');
     // Uložit úkol do completedTasks (kompatibilita se script.js)
