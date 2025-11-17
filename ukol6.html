@@ -3,38 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Najdi 5 rozdílů</title>
+    <title>Najdi 5 rozdílů - Sametová šifra</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
+        /* Game specific styles */
         .game-container {
-            background: white;
-            border-radius: 20px;
+            background: var(--blue);
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 1400px;
-            width: 100%;
+            border-radius: 10px;
+            border: 3px solid var(--white);
+            margin: 30px 0;
         }
 
-        h1 {
+        .game-header {
             text-align: center;
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .game-header h1 {
+            font-family: 'Anton', sans-serif;
+            color: var(--white);
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
         }
 
         .info-bar {
@@ -42,18 +34,21 @@
             justify-content: space-around;
             margin-bottom: 30px;
             padding: 15px;
-            background: #f8f9fa;
+            background: var(--black);
             border-radius: 10px;
+            border: 2px solid var(--white);
         }
 
         .info-item {
             font-size: 1.2em;
             font-weight: bold;
-            color: #333;
+            color: var(--white);
+            text-align: center;
         }
 
         .info-item span {
-            color: #667eea;
+            color: var(--red);
+            font-size: 1.3em;
         }
 
         .images-container {
@@ -69,21 +64,21 @@
             max-width: 600px;
             flex: 1;
             min-width: 300px;
+            border: 3px solid var(--white);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .image-wrapper img {
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            cursor: pointer;
         }
 
         .marker {
             position: absolute;
-            border: 3px solid red;
-            border-radius: 50%; /* Klíčové pro kruhy/ovály */
+            border: 3px solid var(--red);
+            border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
             animation: pulse 0.5s ease-out;
@@ -91,39 +86,9 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.2);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-
-        .controls {
-            text-align: center;
-        }
-
-        .reset-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .reset-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
         .congratulations {
@@ -131,37 +96,56 @@
             text-align: center;
             margin: 20px 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--black);
+            color: var(--white);
             border-radius: 10px;
             font-size: 1.5em;
+            border: 2px solid var(--white);
             animation: slideDown 0.5s ease-out;
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .congratulations.show {
             display: block;
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
 
+        .reset-btn {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
             .images-container {
                 flex-direction: column;
+                align-items: center;
             }
-
+            
+            .image-wrapper {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
             .info-bar {
                 flex-direction: column;
                 gap: 10px;
@@ -170,93 +154,110 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🔍 Najdi 5 rozdílů</h1>
-        
-        <div class="info-bar">
-            <div class="info-item">
-                Nalezeno: <span id="counter">0/5</span>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1>ÚKOL 6</h1>
+                <p class="subtitle">Najdi 5 rozdílů</p>
+                <div class="divider"></div>
             </div>
-            <div class="info-item">
-                Čas: <span id="timer">00:00</span>
-            </div>
-        </div>
+        </header>
 
-        <div class="images-container">
-            <div class="image-wrapper" id="image1-wrapper">
-                <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil1.jpg" alt="Obrázek 1" id="image1">
-            </div>
-            <div class="image-wrapper" id="image2-wrapper">
-                <img src="https://raw.githubusercontent.com/eliskaksthov/samet/refs/heads/main/rozdil2.png" alt="Obrázek 2" id="image2">
-            </div>
-        </div>
+        <main class="content">
+            <div class="game-container">
+                <div class="game-header">
+                    <h1>🔍 Najdi 5 rozdílů</h1>
+                    <p>Klikněte na rozdíly mezi obrázky</p>
+                </div>
+                
+                <div class="info-bar">
+                    <div class="info-item">
+                        Nalezeno: <span id="counter">0/5</span>
+                    </div>
+                    <div class="info-item">
+                        Čas: <span id="timer">00:00</span>
+                    </div>
+                </div>
 
-        <div class="congratulations" id="congratulations">
-            🎉 Gratulujeme! Našli jste všech 5 rozdílů! 🎉
-        </div>
+                <div class="images-container">
+                    <div class="image-wrapper" id="image1-wrapper">
+                        <img src="rozdil1.jpg" alt="Obrázek 1" id="image1">
+                    </div>
+                    <div class="image-wrapper" id="image2-wrapper">
+                        <img src="rozdil2.png" alt="Obrázek 2" id="image2">
+                    </div>
+                </div>
 
-        <div class="controls">
-            <button class="reset-btn" id="resetBtn">🔄 Začít znovu</button>
-        </div>
+                <div class="congratulations" id="congratulations">
+                    🎉 Výborně! Našli jste všech 5 rozdílů! 🎉
+                </div>
+
+                <div class="controls">
+                    <button class="reset-btn" id="resetBtn">🔄 Začít znovu</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Pravda a láska musí zvítězit nad lží a nenávistí</p>
+        </footer>
     </div>
 
     <script>
-        // Definice rozdílů - přesné souřadnice z původního obrázku
-        // Formát: (x_pixel, y_pixel, radius_pixel)
-        const differences = [
-            { x: 317, y: 250, radius: 74, found: false },  // Rozdíl 1: Vlajka (bude ovál)
-            { x: 620, y: 288, radius: 110, found: false },  // Rozdíl 2: Obloha (kruh)
-            { x: 70, y: 635, radius: 45, found: false },   // Rozdíl 3: Kříž (kruh)
-            { x: 337, y: 843, radius: 42, found: false },  // Rozdíl 4: Lidé (kruh)
-            { x: 325, y: 1028, radius: 107, found: false } // Rozdíl 5: Spodní pás (bude ovál)
-        ];
-
-        const originalWidth = 736;  // Původní šířka obrázku
-        const originalHeight = 1104; // Původní výška obrázku (přesnější odhad pro výpočet)
-
-        let foundCount = 0;
-        let startTime = Date.now();
+        // Game variables
+        let differencesFound = 0;
+        let startTime;
         let timerInterval;
+        const totalDifferences = 5;
+        const differenceCoordinates = [
+            { x: 0.75, y: 0.25, radius: 0.05 },  // Adjust these coordinates based on your images
+            { x: 0.25, y: 0.5, radius: 0.05 },
+            { x: 0.6, y: 0.6, radius: 0.05 },
+            { x: 0.4, y: 0.3, radius: 0.05 },
+            { x: 0.8, y: 0.8, radius: 0.05 }
+        ];
+        const foundDifferences = new Array(totalDifferences).fill(false);
 
-        // Inicializace časovače
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
-                const seconds = (elapsed % 60).toString().padStart(2, '0');
-                document.getElementById('timer').textContent = `${minutes}:${seconds}`;
-            }, 1000);
+        // Start the game
+        function startGame() {
+            resetGame();
+            startTimer();
         }
 
-        // Funkce pro kontrolu, zda klik byl na rozdílu
+        // Start the timer
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // Update the timer display
+        function updateTimer() {
+            const currentTime = new Date();
+            const elapsed = Math.floor((currentTime - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+        }
+
+        // Check if the click was on a difference
         function checkDifference(clickX, clickY, imgElement) {
             const rect = imgElement.getBoundingClientRect();
-            
-            // Přepočet kliknutí na skutečné souřadnice obrázku
-            const scaleX = originalWidth / rect.width;
-            const scaleY = originalHeight / rect.height;
-            
-            const actualX = clickX * scaleX;
-            const actualY = clickY * scaleY;
+            const x = (clickX - rect.left) / rect.width;
+            const y = (clickY - rect.top) / rect.height;
 
-            for (let i = 0; i < differences.length; i++) {
-                const diff = differences[i];
+            for (let i = 0; i < differenceCoordinates.length; i++) {
+                if (foundDifferences[i]) continue;
+
+                const diff = differenceCoordinates[i];
+                const distance = Math.sqrt(Math.pow(x - diff.x, 2) + Math.pow(y - diff.y, 2));
                 
-                if (diff.found) continue;
-
-                // Používáme poloměr pro kruhovou detekční zónu
-                const distance = Math.sqrt(
-                    Math.pow(actualX - diff.x, 2) + 
-                    Math.pow(actualY - diff.y, 2)
-                );
-
-                if (distance <= diff.radius) {
-                    diff.found = true;
-                    foundCount++;
-                    markDifference(diff.x, diff.y, diff.radius);
+                if (distance < diff.radius) {
+                    foundDifferences[i] = true;
+                    markDifference(diff.x * 100, diff.y * 100, diff.radius * 100);
+                    differencesFound++;
                     updateCounter();
                     
-                    if (foundCount === 5) {
+                    if (differencesFound === totalDifferences) {
                         endGame();
                     }
                     return true;
@@ -265,83 +266,48 @@
             return false;
         }
 
-        // Funkce pro označení nalezeného rozdílu - UPRAVENO PRO SVÍSLÉ OVÁLY
+        // Mark a found difference
         function markDifference(x, y, radius) {
-            // Index nalezeného rozdílu
-            const index = differences.findIndex(diff => diff.x === x && diff.y === y && diff.radius === radius);
+            const marker = document.createElement('div');
+            marker.className = 'marker';
+            marker.style.width = `${radius * 2}%`;
+            marker.style.height = `${radius * 2}%`;
+            marker.style.left = `${x}%`;
+            marker.style.top = `${y}%`;
             
-            // Označení na obou obrázcích
-            ['image1-wrapper', 'image2-wrapper'].forEach(wrapperId => {
-                const wrapper = document.getElementById(wrapperId);
-                const img = wrapper.querySelector('img');
-                const rect = img.getBoundingClientRect();
-                
-                // Přepočet souřadnic na aktuální velikost obrázku
-                const scaleX = rect.width / originalWidth;
-                const scaleY = rect.height / originalHeight;
-                
-                const displayX = x * scaleX;
-                const displayY = y * scaleY;
-
-                let displayRadiusX = radius * scaleX; // Šířka oválu (X-dimenze)
-                let displayRadiusY = radius * scaleY; // Výška oválu (Y-dimenze)
-                
-                // Nastavení rozdílných rozměrů pro ovály
-                if (index === 4) { // Kruh 5: Spodní pás (HORIZONTÁLNÍ ovál)
-                    displayRadiusX = radius * scaleX * 1.5; 
-                    displayRadiusY = radius * scaleY * 0.7; 
-                } else if (index === 0) { // Kruh 1: NOVĚ SVÍSLÝ OVÁL
-                    displayRadiusX = radius * scaleX * 0.8; // Zmenšíme ŠÍŘKU
-                    displayRadiusY = radius * scaleY * 1.4; // Zvětšíme VÝŠKU
-                } else if (index === 1) { // Kruh 2: NOVĚ SVÍSLÝ OVÁL
-                    displayRadiusX = radius * scaleX * 0.7; // Zmenšíme ŠÍŘKU
-                    displayRadiusY = radius * scaleY * 1.3; // Zvětšíme VÝŠKU
-                }
-                // Ostatní kruhy (index 2, 3) zůstanou kruhy.
-
-                const marker = document.createElement('div');
-                marker.className = 'marker';
-                marker.style.left = displayX + 'px';
-                marker.style.top = displayY + 'px';
-                // Použití rozdílných dimenzí pro šířku a výšku pro ovály
-                marker.style.width = (displayRadiusX * 2) + 'px';
-                marker.style.height = (displayRadiusY * 2) + 'px'; 
-                wrapper.appendChild(marker);
-            });
+            // Add to both images
+            document.getElementById('image1-wrapper').appendChild(marker.cloneNode());
+            document.getElementById('image2-wrapper').appendChild(marker);
         }
 
-        // Aktualizace čítače
+        // Update the counter
         function updateCounter() {
-            document.getElementById('counter').textContent = `${foundCount}/5`;
+            document.getElementById('counter').textContent = `${differencesFound}/${totalDifferences}`;
         }
 
-        // Ukončení hry
+        // End the game
         function endGame() {
             clearInterval(timerInterval);
             document.getElementById('congratulations').classList.add('show');
         }
 
-        // Reset hry
+        // Reset the game
         function resetGame() {
-            // Vymazání všech markerů
-            document.querySelectorAll('.marker').forEach(marker => marker.remove());
-            
-            // Reset rozdílů
-            differences.forEach(diff => diff.found = false);
-            foundCount = 0;
-            
-            // Reset UI
-            updateCounter();
+            clearInterval(timerInterval);
+            differencesFound = 0;
+            foundDifferences.fill(false);
+            document.getElementById('counter').textContent = '0/5';
+            document.getElementById('timer').textContent = '00:00';
             document.getElementById('congratulations').classList.remove('show');
             
-            // Reset časovače
-            clearInterval(timerInterval);
-            startTime = Date.now();
-            document.getElementById('timer').textContent = '00:00';
-            startTimer();
+            // Remove all markers
+            document.querySelectorAll('.marker').forEach(marker => marker.remove());
+            
+            // Restart the game
+            startGame();
         }
 
-        // Event listenery pro klikání na obrázky
+        // Event listeners for clicking on images
         document.getElementById('image1').addEventListener('click', (e) => {
             const rect = e.target.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
@@ -359,11 +325,8 @@
         // Reset button
         document.getElementById('resetBtn').addEventListener('click', resetGame);
 
-        // Spuštění časovače při načtení stránky
-        resetGame(); // Použijeme resetGame pro inicializaci hry a start časovače
+        // Start the game when the page loads
+        window.addEventListener('load', startGame);
     </script>
 </body>
 </html>
-
-
-
