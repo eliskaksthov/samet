@@ -1,52 +1,130 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Úkol 8 — Citáty</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-
-  <style>
-    .container { max-width:900px; margin:18px auto; padding:12px; }
-    h2 { margin-bottom:6px; }
-    .line { margin: 12px 0; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .blanks { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    .blank-select { min-width:120px; padding:6px; border-radius:6px; border:1px solid #ccc; background:#fff; }
-    .check-btn { padding:6px 10px; border-radius:6px; cursor:pointer; border:1px solid #1976d2; background:#1976d2; color:#fff; }
-    .check-btn[disabled] { opacity:0.5; cursor:default; }
-    .checkmark { color: #1b8e3a; font-weight:800; margin-left:8px; }
-    .hidden { display:none; }
-    .note { color:#444; margin-top:8px; }
-    .controls { margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .small { font-size:0.9rem; color:#666; }
-    #feedback { margin-top:12px; font-weight:700; }
-    .feedback.success { color:#0a0; }
-    .feedback.error { color:#c00; }
-    /* responsive */
-    @media (max-width:520px) {
-      .blank-select { min-width:80px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sametová bojovka - Úkol 8: Citáty</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .line { 
+            margin: 18px 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
+        .blanks { 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            margin: 10px 0;
+        }
+        .blank-select { 
+            min-width: 140px; 
+            padding: 8px; 
+            border-radius: 4px; 
+            border: 1px solid #ccc; 
+            background: #fff;
+            font-size: 16px;
+        }
+        .check-btn { 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            border: 1px solid #1976d2; 
+            background: #1976d2; 
+            color: #fff;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .check-btn:hover:not([disabled]) {
+            background: #1565c0;
+            transform: translateY(-1px);
+        }
+        .check-btn[disabled] { 
+            opacity: 0.5; 
+            cursor: default; 
+        }
+        .checkmark { 
+            color: #2e7d32; 
+            font-weight: 800; 
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+        .hidden { 
+            display: none; 
+        }
+        #feedback { 
+            margin: 15px 0; 
+            font-weight: 700; 
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .feedback.success { 
+            color: #1b5e20; 
+            background-color: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+        }
+        .feedback.error { 
+            color: #b71c1c; 
+            background-color: #ffebee;
+            border-left: 4px solid #c62828;
+        }
+        .task-instructions {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border-left: 4px solid #1976d2;
+        }
+        @media (max-width: 600px) {
+            .blank-select { 
+                min-width: 100%;
+                margin-bottom: 8px;
+            }
+            .line {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Citáty.</h2>
-    <p>Vyplň jednotlivé mezery výběrem slov z nabídky. Po správné kombinaci na řádku se objeví zelený šek a odemkne se další řádek.</p>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1>ÚKOL 8: CITÁTY</h1>
+                <div class="divider"></div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="task-instructions">
+                <h2>Dokonči slavné citáty</h2>
+                <p>Vyplň jednotlivé mezery výběrem slov z nabídky. Po správné kombinaci na řádku se objeví zelený šek a odemkne se další řádek.</p>
+            </div>
 
     <!-- Lines container -->
-    <div id="quotes-wrapper">
-      <!-- Lines will be generated here by script -->
+            <div id="quotes-wrapper">
+                <!-- Lines will be generated here by script -->
+            </div>
+
+            <div id="feedback" role="status" aria-live="polite"></div>
+        </main>
+
+        <footer>
+            <p>Pravda a láska musí zvítězit nad lží a nenávistí</p>
+        </footer>
     </div>
 
-    <div id="feedback" role="status" aria-live="polite"></div>
-
-    <div class="note">
-     
-    </div>
-  </div>
-
-  <script>
+    <script src="script.js"></script>
+    <script>
     // -------------------------------------------
     // SEKCE PRO ÚPRAVU (ZDE upravte slovní nabídky a správné kombinace)
     // -------------------------------------------
@@ -107,6 +185,14 @@
     // -------------------------------------------
     // Konec sekce pro úpravu
     // -------------------------------------------
+    
+    // Inicializace časomíry
+    document.addEventListener('DOMContentLoaded', function() {
+        // Spustí časomíru, pokud ještě neběží
+        if (typeof startTimer === 'function' && !window.timerStarted) {
+            startTimer();
+        }
+    });
 
     // další konfigurace
     const TASK_NUMBER = 8;           // číslo úkolu (nechte 8 pokud odpovídá ukol8.html)
