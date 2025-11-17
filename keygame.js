@@ -2,7 +2,7 @@
 // Nezasahuje do script.js, ale při splnění přidá úkol 10 do completedTasks a zavolá updateProgress()
 
 (function () {
-  const DURATION_MS = 80 * 1000; // 60 sekund
+  const DURATION_MS = 60 * 1000; // 60 sekund
   const SHOW_MS = 1500; // 1 s per klíč (appearance)
   const SPAWN_INTERVAL_MS = 500; // spawn každých 0.5s
   const TARGET_COUNT = 89;
