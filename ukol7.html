@@ -1,23 +1,260 @@
-<!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 7 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 7</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWER7', 'ukol8.html')">Odeslat</button>
-        </div>
-        <p id="feedback"></p>
-        <div class="footer">Správná odpověď (dočasná): <strong>ANSWER7</strong></div>
+<<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Úkol 7 — Sametová šifra</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+
+  <style>
+    /* layout for the three-lock puzzle */
+    .locks-row {
+      display:flex;
+      justify-content:space-around;
+      align-items:flex-start;
+      gap: 16px;
+      margin: 18px 0 8px;
+      flex-wrap:wrap;
+    }
+    .lock {
+      text-align:center;
+      width: 170px;
+      user-select: none;
+    }
+    .lock img {
+      width: 140px;
+      height: auto;
+      cursor: pointer;
+      display:block;
+      margin: 0 auto 8px;
+    }
+    .lock .label {
+      font-size: 0.95rem;
+      color: #333;
+      margin-bottom:6px;
+    }
+    .lock .num {
+      font-size: 2.2rem;
+      font-weight:700;
+      color:#111;
+      background:#f3f3f3;
+      padding:6px 10px;
+      border-radius:8px;
+      display:inline-block;
+      min-width:90px;
+    }
+
+    .note { margin-top:10px; }
+
+    /* feedback styles similar to script.js */
+    #feedback { margin-top:14px; font-weight:600; }
+    .feedback.success { color: #0a0; }
+    .feedback.error { color: #c00; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Úkol 7 — Zámky (slož datum)</h2>
+
+    <p><!-- Popis úkolu pro pořadatele -->Vyřeš kombinaci tří zámků (den, měsíc, rok). Startovní hodnoty jsou 0. Kliknutím na zámek se hodnota změní podle pravidel níže. Po sestavení správného data (17.11.1989) se úkol označí jako splněný.</p>
+
+    <div class="locks-row" aria-hidden="false">
+      <div class="lock" id="lock-day" data-value="0" data-step="1" data-max="30" aria-label="Den">
+        <div class="label">Den</div>
+        <img src="images/lock_closed.png" alt="Zámek - den" id="img-day">
+        <div class="num" id="num-day">0</div>
+        <div class="hint">Klikni pro zvýšení (0 → 30 → 0)</div>
       </div>
-    </body>
-    </html>
+
+      <div class="lock" id="lock-month" data-value="0" data-step="1" data-max="12" aria-label="Měsíc">
+        <div class="label">Měsíc</div>
+        <img src="images/lock_closed.png" alt="Zámek - měsíc" id="img-month">
+        <div class="num" id="num-month">0</div>
+        <div class="hint">Klikni pro zvýšení (0 → 12 → 0)</div>
+      </div>
+
+      <div class="lock" id="lock-year" data-value="0" data-step="39" data-max="" aria-label="Rok">
+        <div class="label">Rok</div>
+        <img src="images/lock_closed.png" alt="Zámek - rok" id="img-year">
+        <div class="num" id="num-year">0</div>
+        <div class="hint">Klikni pro přidání 39. Po dosažení správného roku (=1989) další kliknutí nefungují.</div>
+      </div>
+    </div>
+
+    <p class="note">Poznámka: obrázky zámků uložte do repozitáře (např. images/lock_closed.png). Pokud nemáte obrázky, funguje i stejný obrázek pro všechny tři.</p>
+
+    <p id="feedback" role="status" aria-live="polite"></p>
+
+    <div class="footer">Správná kombinace: <strong>17.11.1989</strong></div>
+  </div>
+
+  <script>
+    // --- KONFIGURACE (pouze v tomto souboru) ---
+    const TASK_NUMBER = 7;                      // číslo úkolu (shodné s ostatními)
+    const CHARS_FOR_TASK = '__';                // znak(y) uložené při splnění úkolu (upravit podle potřeby)
+    const TARGET = { day: 17, month: 11, year: 1989 };
+
+    // inicializace
+    document.addEventListener('DOMContentLoaded', () => {
+      initLock(document.getElementById('lock-day'));
+      initLock(document.getElementById('lock-month'));
+      initLock(document.getElementById('lock-year'));
+
+      // pouze v případě, že už byla úloha splněna dříve, zobrazíme stav z localStorage
+      const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+      if (completed.includes(TASK_NUMBER)) {
+        showFeedbackSuccess('Úkol byl již dříve splněn.');
+        // načíst uložené znaky a případně hodnoty (pokud chcete uchovávat i nastavení zámků)
+      }
+    });
+
+    // nastaví klikací chování pro jeden zámek
+    function initLock(lockEl) {
+      const img = lockEl.querySelector('img');
+      const numEl = lockEl.querySelector('.num');
+
+      // ensure numeric data-value is set (string -> number)
+      lockEl.dataset.value = Number(lockEl.dataset.value || 0);
+
+      img.addEventListener('click', () => {
+        handleLockClick(lockEl, numEl, img);
+      });
+
+      // update visible number at start
+      numEl.textContent = lockEl.dataset.value;
+    }
+
+    function handleLockClick(lockEl, numEl, imgEl) {
+      const id = lockEl.id; // 'lock-day', 'lock-month', 'lock-year'
+      let value = Number(lockEl.dataset.value || 0);
+      const step = Number(lockEl.dataset.step || 1);
+      const max = lockEl.dataset.max ? Number(lockEl.dataset.max) : null;
+
+      if (id === 'lock-year') {
+        // year special: add step each click, but stop when reaching or exceeding target year
+        if (value >= TARGET.year) {
+          // already at or past target - do nothing
+          return;
+        }
+        value += step;
+        if (value > TARGET.year) {
+          // if overshoot, clamp to target
+          value = TARGET.year;
+        }
+        // when reached target year, optionally change image to "unlocked" (if you have such image)
+        if (value === TARGET.year) {
+          // try to change image to an "unlocked" image if available
+          safeSetImage(imgEl, 'images/lock_open.png');
+        }
+      } else {
+        // day/month: increment by step, wrap when exceeding max
+        value += step;
+        if (max !== null && !isNaN(max)) {
+          if (value > max) {
+            // wrap back to 0
+            value = 0;
+          }
+        }
+      }
+
+      lockEl.dataset.value = value;
+      numEl.textContent = value;
+
+      // small visual: change image to open if this particular slot matches target
+      if (isLockValueCorrect(lockEl, value)) {
+        safeSetImage(imgEl, 'images/lock_open.png');
+      } else {
+        safeSetImage(imgEl, 'images/lock_closed.png');
+      }
+
+      // After every click check whether all three locks together form the target date
+      checkAllLocksForTarget();
+    }
+
+    function isLockValueCorrect(lockEl, value) {
+      if (lockEl.id === 'lock-day') return value === TARGET.day;
+      if (lockEl.id === 'lock-month') return value === TARGET.month;
+      if (lockEl.id === 'lock-year') return value === TARGET.year;
+      return false;
+    }
+
+    function checkAllLocksForTarget() {
+      const day = Number(document.getElementById('lock-day').dataset.value || 0);
+      const month = Number(document.getElementById('lock-month').dataset.value || 0);
+      const year = Number(document.getElementById('lock-year').dataset.value || 0);
+
+      if (day === TARGET.day && month === TARGET.month && year === TARGET.year) {
+        // success: mark task completed (compatible with script.js storage format)
+        markTaskComplete();
+        showFeedbackSuccess('Správně! Datum složeno: ' + TARGET.day + '.' + TARGET.month + '.' + TARGET.year);
+      }
+    }
+
+    function markTaskComplete() {
+      // add to completedTasks if not present
+      const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+      if (!completed.includes(TASK_NUMBER)) {
+        completed.push(TASK_NUMBER);
+        localStorage.setItem('completedTasks', JSON.stringify(completed));
+      }
+
+      // set collectedChars for this task in the same format script.js expects
+      const collectedChars = JSON.parse(localStorage.getItem('collectedChars') || '{}');
+      collectedChars[TASK_NUMBER] = CHARS_FOR_TASK;
+      localStorage.setItem('collectedChars', JSON.stringify(collectedChars));
+
+      // update global progress indicator (updateProgress is defined in script.js)
+      if (typeof updateProgress === 'function') {
+        try { updateProgress(); } catch (e) { console.warn('updateProgress() failed', e); }
+      }
+
+      // disable further clicks on all locks (prevent accidental changes)
+      disableAllLocks();
+    }
+
+    function disableAllLocks() {
+      ['img-day','img-month','img-year'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.cursor = 'default';
+          el.classList.add('disabled');
+          // remove click handlers by cloning node
+          const clone = el.cloneNode(true);
+          el.parentNode.replaceChild(clone, el);
+        }
+      });
+    }
+
+    function showFeedbackSuccess(msg) {
+      const fb = document.getElementById('feedback');
+      fb.textContent = msg;
+      fb.className = 'feedback success';
+    }
+
+    function showFeedbackError(msg) {
+      const fb = document.getElementById('feedback');
+      fb.textContent = msg;
+      fb.className = 'feedback error';
+    }
+
+    // Helper: set image src only if file exists is not possible from JS alone cross-origin,
+    // so we just set the src and rely on developer to add the file. If missing, browser will show broken icon.
+    function safeSetImage(imgEl, src) {
+      if (!imgEl) return;
+      imgEl.src = src;
+    }
+
+    // Optional: allow keyboard testing: D/M/Y keys to increment quickly
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'd' || e.key === 'D') {
+        document.getElementById('img-day').click();
+      } else if (e.key === 'm' || e.key === 'M') {
+        document.getElementById('img-month').click();
+      } else if (e.key === 'y' || e.key === 'Y') {
+        document.getElementById('img-year').click();
+      }
+    });
+  </script>
+</body>
+</html>
