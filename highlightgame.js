@@ -3,13 +3,13 @@
 // Kontrola tajenky funguje (porovnání s uloženým řešením); při úspěchu se uloží collectedChars[11] a přidá se úkol 11 do completedTasks.
 
 (function () {
-  const TASK_NUM = 11;
+  const TASK_NUM = 12;
   const STORAGE_KEYS = {
-    rawText: 'ukol11_rawText',
-    highlights: 'ukol11_highlights',   // object: { idx: char } - pořadí je v poolOrder
-    poolOrder: 'ukol11_poolOrder',     // array of idx in selection order
-    assembled: 'ukol11_assembled',
-    solution: 'ukol11_solution',
+    rawText: 'ukol12_rawText',
+    highlights: 'ukol12_highlights',   // object: { idx: char } - pořadí je v poolOrder
+    poolOrder: 'ukol12_poolOrder',     // array of idx in selection order
+    assembled: 'ukol12_assembled',
+    solution: 'ukol12_solution',
     organizerMode: 'ukol11_organizerMode'
   };
 
