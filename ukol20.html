@@ -29,8 +29,8 @@
       font-weight: 600;
       margin-top: 10px;
     }
-    #feedback.correct { color: #0a0; }
-    #feedback.wrong   { color: #c00; }
+    .feedback .success { color: #0a0; }
+    .feedback .error   { color: #c00; }
   </style>
 </head>
 <body>
@@ -50,7 +50,8 @@
     <input type="text" id="answer" placeholder="Zadejte odpověď">
 
     <div style="margin-top:10px;">
-      <button onclick="checkAnswer(CORRECT_ANSWER, 'ukol3.html')">Odeslat</button>
+      <!-- Button calls a local wrapper (we DO NOT modify script.js) -->
+      <button onclick="submitUkol20()">Odeslat</button>
     </div>
 
     <p id="feedback" role="status" aria-live="polite"></p>
@@ -59,17 +60,18 @@
   </div>
 
   <script>
-    // Jediný řádek, kde nastavíte očekávanou odpověď:
-    // Můžete zadat s nebo bez diakritiky, tečky apod. - níže používáme normalizaci, takže to není citlivé na háčky/čárky.
-    const CORRECT_ANSWER = 'VCERA BYLA SAMETOVA REVOLUCE.';
+    // --- KONFIGURACE: zde nastavte očekávanou odpověď pro tento úkol (pouze v tomto souboru) ---
+    const EXPECTED_ANSWER = 'VCERA BYLA SAMETOVA REVOLUCE.'; // přesně ta fráze, kterou chcete akceptovat
 
-    // Pokud chcete během testování vidět odpověď ve footeru, odkomentujte následující řádek:
-    // document.getElementById('answer-reveal').textContent = CORRECT_ANSWER;
+    // Jaké znaky za úkol získá hráč (uloží se do collectedChars pro přehled finále).
+    // Nastavte podle potřeby (např. 'A', 'B', 'C' nebo víc znaků). Pokud žádné, použijte '__'.
+    const CHARS_FOR_TASK = '__';
 
-    // Normalizace pro porovnání:
-    // - odstraní diakritiku (ř -> r, á -> a)
-    // - odstraní veškeré znaky kromě písmen, číslic a mezer (tedy tečku/přebytečnou interpunkci odstraní)
-    // - sloučí více mezer na jednu a přepne na velká písmena
+    // Číslo tohoto úkolu v systému (shodné se zbytkem aplikace)
+    const TASK_NUMBER = 20;
+
+    // Normalizace pro porovnání: odstraní diakritiku, odstraní interpunkci kromě písmen a číslic,
+    // sloučí mezery a přepne na velká písmena — tím povolíme různé varianty zápisu uživatele.
     function normalizeForCompare(s) {
       return String(s || '')
         .normalize('NFD')                    // rozloží znaky s diakritikou
@@ -80,34 +82,74 @@
         .toUpperCase();
     }
 
-    function checkAnswer(correct, next) {
-      const input = document.getElementById('answer');
-      const feedback = document.getElementById('feedback');
-      const userRaw = (input.value || '').trim();
+    // Lokální wrapper pro odeslání odpovědi — NEZASAHUJE do script.js, místo toho
+    // aplikuje normalizaci a provede stejné kroky, které dělá checkAnswer ve script.js:
+    // - ukáže feedback
+    // - uloží completedTasks a collectedChars do localStorage
+    // - zavolá updateProgress() (funkce je v script.js, takže ji můžeme použít)
+    // - přesměruje na další stránku, pokud je odpověď správná
+    function submitUkol20(next = 'ukol3.html') {
+      const inputEl = document.getElementById('answer');
+      const feedbackEl = document.getElementById('feedback');
+      const userRaw = (inputEl.value || '');
 
-      // Debug (pokud chcete vidět v konzoli jaké stringy se porovnávají, odkomentujte):
-      // console.log('user raw:', JSON.stringify(userRaw), 'normalized:', normalizeForCompare(userRaw));
-      // console.log('correct raw:', JSON.stringify(correct), 'normalized:', normalizeForCompare(correct));
+      // porovnání normalizované formy
+      if (normalizeForCompare(userRaw) === normalizeForCompare(EXPECTED_ANSWER)) {
+        // Správně — zobrazíme stejnou strukturu jako script.js
+        feedbackEl.innerHTML = `
+          <div class="success">
+            ✅ <strong>Správně!</strong><br>
+            Získané znaky: <span class="chars">${CHARS_FOR_TASK}</span><br><br>
+            📍 <strong>Nápověda na další QR kód:</strong><br>
+            (pokud chcete sem vložte text s nápovědou)
+          </div>
+        `;
+        feedbackEl.className = 'feedback success';
 
-      if (normalizeForCompare(userRaw) === normalizeForCompare(String(correct))) {
-        feedback.textContent = 'Správně — pokračuji dál...';
-        feedback.classList.remove('wrong');
-        feedback.classList.add('correct');
-        if (next) setTimeout(() => { window.location.href = next; }, 1200);
+        // Uložit splněný úkol do localStorage (stejný formát jako script.js)
+        const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+        if (!completed.includes(TASK_NUMBER)) {
+          completed.push(TASK_NUMBER);
+          localStorage.setItem('completedTasks', JSON.stringify(completed));
+        }
+
+        // Uložit získané znaky
+        const collectedChars = JSON.parse(localStorage.getItem('collectedChars') || '{}');
+        collectedChars[TASK_NUMBER] = CHARS_FOR_TASK;
+        localStorage.setItem('collectedChars', JSON.stringify(collectedChars));
+
+        // Aktualizovat progress (funkce updateProgress je definovaná v script.js)
+        if (typeof updateProgress === 'function') {
+          try { updateProgress(); } catch (e) { console.warn('updateProgress() failed', e); }
+        }
+
+        // Pokud jsou splněny všechny úkoly, necháme script.js upozornit (pokud to chceš,
+        // můžeš ponechat i vlastní alert zde). Tady redirect s krátkým zpožděním:
+        setTimeout(() => {
+          window.location.href = next;
+        }, 1200);
+
       } else {
-        feedback.textContent = 'Špatně — zkuste to znovu.';
-        feedback.classList.remove('correct');
-        feedback.classList.add('wrong');
+        // Nesprávně
+        feedbackEl.innerHTML = `
+          <div class="error">
+            ❌ <strong>Nesprávně.</strong> Zkus to znovu!
+          </div>
+        `;
+        feedbackEl.className = 'feedback error';
       }
     }
 
-    // Enter = odeslat
+    // Podpora klávesy Enter
     document.getElementById('answer').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        checkAnswer(CORRECT_ANSWER, 'ukol3.html');
+        submitUkol20('ukol3.html');
       }
     });
+
+    // Volitelně: během testování zobrazíme správnou odpověď v patičce (odkomentujte pokud chcete)
+    // document.getElementById('answer-reveal').textContent = EXPECTED_ANSWER;
   </script>
 </body>
 </html>
