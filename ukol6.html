@@ -265,7 +265,7 @@
             return false;
         }
 
-        // Funkce pro označení nalezeného rozdílu - UPRAVENO PRO OVÁLY
+        // Funkce pro označení nalezeného rozdílu - UPRAVENO PRO SVÍSLÉ OVÁLY
         function markDifference(x, y, radius) {
             // Index nalezeného rozdílu
             const index = differences.findIndex(diff => diff.x === x && diff.y === y && diff.radius === radius);
@@ -287,15 +287,17 @@
                 let displayRadiusY = radius * scaleY; // Výška oválu (Y-dimenze)
                 
                 // Nastavení rozdílných rozměrů pro ovály
-                if (index === 4) { // Kruh 5: Spodní pás (velký horizontální ovál)
-                    displayRadiusX = radius * scaleX * 1.5; // Zvětšíme X-dimenzi
-                    displayRadiusY = radius * scaleY * 0.7; // Zmenšíme Y-dimenzi
-                } else if (index === 0) { // Kruh 1: Vlajka (mírný horizontální ovál)
-                    displayRadiusX = radius * scaleX * 1.3;
-                    displayRadiusY = radius * scaleY * 1.0;
+                if (index === 4) { // Kruh 5: Spodní pás (HORIZONTÁLNÍ ovál)
+                    displayRadiusX = radius * scaleX * 1.5; 
+                    displayRadiusY = radius * scaleY * 0.7; 
+                } else if (index === 0) { // Kruh 1: NOVĚ SVÍSLÝ OVÁL
+                    displayRadiusX = radius * scaleX * 0.8; // Zmenšíme ŠÍŘKU
+                    displayRadiusY = radius * scaleY * 1.4; // Zvětšíme VÝŠKU
+                } else if (index === 1) { // Kruh 2: NOVĚ SVÍSLÝ OVÁL
+                    displayRadiusX = radius * scaleX * 0.7; // Zmenšíme ŠÍŘKU
+                    displayRadiusY = radius * scaleY * 1.3; // Zvětšíme VÝŠKU
                 }
-                // Ostatní kruhy (index 1, 2, 3) zůstanou kruhy s poměrem stran 1:1, protože
-                // displayRadiusX a displayRadiusY jsou blízko sobě.
+                // Ostatní kruhy (index 2, 3) zůstanou kruhy.
 
                 const marker = document.createElement('div');
                 marker.className = 'marker';
@@ -362,5 +364,6 @@
     </script>
 </body>
 </html>
+
 
 
