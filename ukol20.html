@@ -37,15 +37,10 @@
   <div class="container">
     <h2>Úkol 20</h2>
 
-    <!-- Put the image for the task here.
-         Recommended: save your image into the repository at images/ukol20.jpg
-         then use src="images/ukol20.jpg".
-         If you keep a filename with special characters ("Šifra 1.JPG"), it may still work
-         but it's better to rename to ascii-only name like ukol20.jpg or sifra1.jpg.
-    -->
+    <!-- Obrázek úkolu: uložte do repozitáře např. images/ukol20.jpg a/nebo změňte src -->
     <figure class="task-figure" aria-hidden="false">
       <img src="images/ukol20.jpg" alt="Úkol 20 — šifra (ilustrační obrázek)" class="task-image" loading="lazy">
-      <figcaption class="task-caption"></figcaption>
+      <figcaption class="task-caption">Nápověda a šifra (uložte obrázek do images/ukol20.jpg nebo změňte src).</figcaption>
     </figure>
 
     <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
@@ -55,7 +50,6 @@
     <input type="text" id="answer" placeholder="Zadejte odpověď">
 
     <div style="margin-top:10px;">
-      <!-- The button calls checkAnswer with the constant CORRECT_ANSWER -->
       <button onclick="checkAnswer(CORRECT_ANSWER, 'ukol3.html')">Odeslat</button>
     </div>
 
@@ -65,32 +59,41 @@
   </div>
 
   <script>
-    // <-- Set the solution on this single line (exactly as you want it compared).
-    // The required correct answer you asked for:
-    const CORRECT_ANSWER = 'VCERA BYLA SAMETOVA REVOLUCE';
+    // Jediný řádek, kde nastavíte očekávanou odpověď:
+    // Můžete zadat s nebo bez diakritiky, tečky apod. - níže používáme normalizaci, takže to není citlivé na háčky/čárky.
+    const CORRECT_ANSWER = 'VCERA BYLA SAMETOVA REVOLUCE.';
 
-    // If you want the page to display the answer in the footer during testing, uncomment:
+    // Pokud chcete během testování vidět odpověď ve footeru, odkomentujte následující řádek:
     // document.getElementById('answer-reveal').textContent = CORRECT_ANSWER;
 
-    /**
-     * checkAnswer(correct, next)
-     * - compares user's input in uppercase trimmed form to the CORRECT_ANSWER
-     * - shows green/red feedback and, if correct, redirects to next page after a short delay
-     */
+    // Normalizace pro porovnání:
+    // - odstraní diakritiku (ř -> r, á -> a)
+    // - odstraní veškeré znaky kromě písmen, číslic a mezer (tedy tečku/přebytečnou interpunkci odstraní)
+    // - sloučí více mezer na jednu a přepne na velká písmena
+    function normalizeForCompare(s) {
+      return String(s || '')
+        .normalize('NFD')                    // rozloží znaky s diakritikou
+        .replace(/[\u0300-\u036f]/g, '')     // smaže diakritiku
+        .replace(/[^A-Z0-9 ]/ig, '')         // smaže interpunkci a speciální znaky (nechá písmena, čísla, mezery)
+        .replace(/\s+/g, ' ')                // sloučí opakované mezery
+        .trim()
+        .toUpperCase();
+    }
+
     function checkAnswer(correct, next) {
       const input = document.getElementById('answer');
       const feedback = document.getElementById('feedback');
-      const user = (input.value || '').trim().toUpperCase();
+      const userRaw = (input.value || '').trim();
 
-      // exact compare including punctuation (dot) as requested
-      if (user === String(correct).trim().toUpperCase()) {
+      // Debug (pokud chcete vidět v konzoli jaké stringy se porovnávají, odkomentujte):
+      // console.log('user raw:', JSON.stringify(userRaw), 'normalized:', normalizeForCompare(userRaw));
+      // console.log('correct raw:', JSON.stringify(correct), 'normalized:', normalizeForCompare(correct));
+
+      if (normalizeForCompare(userRaw) === normalizeForCompare(String(correct))) {
         feedback.textContent = 'Správně — pokračuji dál...';
         feedback.classList.remove('wrong');
         feedback.classList.add('correct');
-
-        if (next) {
-          setTimeout(() => { window.location.href = next; }, 1200);
-        }
+        if (next) setTimeout(() => { window.location.href = next; }, 1200);
       } else {
         feedback.textContent = 'Špatně — zkuste to znovu.';
         feedback.classList.remove('correct');
@@ -98,7 +101,7 @@
       }
     }
 
-    // allow Enter to submit
+    // Enter = odeslat
     document.getElementById('answer').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
