@@ -3,9 +3,9 @@
 
 (function () {
   const DURATION_MS = 60 * 1000; // 60 sekund
-  const SHOW_MS = 500; // 0.5 s per klíč (appearance)
+  const SHOW_MS = 1000; // 0.5 s per klíč (appearance)
   const SPAWN_INTERVAL_MS = 500; // spawn každých 0.5s
-  const TARGET_COUNT = 100;
+  const TARGET_COUNT = 20;
   const TASK_NUMBER = 10; // číslo úkolu, které označíme jako splněné při úspěchu
 
   // Klíčový obrázek - adjust path pokud je jinde
