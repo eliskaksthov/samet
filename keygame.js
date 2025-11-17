@@ -9,7 +9,7 @@
   const TASK_NUMBER = 10; // číslo úkolu, které označíme jako splněné při úspěchu
 
   // Klíčový obrázek - adjust path pokud je jinde
-  const KEY_SRC = 'key.png';
+  const KEY_SRC = 'images/key.png';
 
   // Storage keys pro zachování stavu mezi reloady
   const STORAGE_KEYS = {
