@@ -1,23 +1,422 @@
 <!doctype html>
-    <html lang="cs">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Úkol 9 — Sametová šifra</title>
-      <link rel="stylesheet" href="style.css">
-      <script src="script.js" defer></script>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Úkol 9</h2>
-        <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
-        <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
-        <input type="text" id="answer" placeholder="Zadejte odpověď">
-        <div style="margin-top:10px;">
-          <button onclick="checkAnswer('ANSWER9', 'ukol10.html')">Odeslat</button>
-        </div>
-        <p id="feedback"></p>
-        <div class="footer">Správná odpověď (dočasná): <strong>ANSWER9</strong></div>
-      </div>
-    </body>
-    </html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Úkol 9 — Bludiště</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+
+  <style>
+    .container { max-width:900px; margin:18px auto; padding:12px; }
+    h2 { margin-bottom:6px; }
+    .maze-wrap { position:relative; display:inline-block; background:#000; border:1px solid #333; }
+    canvas { display:block; touch-action: none; } /* disable default touch gestures */
+    .controls { margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .btn { padding:8px 12px; border-radius:6px; border:1px solid #1976d2; cursor:pointer; background:#1976d2; color:#fff; }
+    .btn.secondary { background:#fff; color:#1976d2; border:1px solid #1976d2; }
+    .status { margin-left:10px; font-weight:700; }
+    #maze-timer { font-family:monospace; }
+    .note { margin-top:10px; color:#444; }
+    .success { color:#0a0; }
+    .error { color:#c00; }
+    .small { font-size:0.9rem; color:#666; }
+    /* make canvas responsive but maintain pixel collision by scaling drawing coordinates */
+    .maze-wrap.responsive { width:100%; max-width:740px; }
+    .maze-wrap.responsive canvas { width:100%; height:auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Úkol 9 — Bludiště</h2>
+
+    <p class="small">Projdi bludiště od START do CÍL prstem (nebo myší). Při projetí zanechá tvůj pohyb barevnou stopu. Stopu nesmíš nechat dotknout se stěn (bílých čar). Pokud se dotkneš, stopa se smaže a musíš zkusit znovu. Měří se čas od prvního tahu. Stiskem Restart bludiště restartuješ (čas a stopu).</p>
+
+    <div id="maze-area" class="maze-wrap responsive" aria-label="Bludiště">
+      <!-- Two canvases:
+           - baseCanvas: draws the maze image (walls)
+           - drawCanvas: draws the colored trail on top
+      -->
+      <canvas id="baseCanvas"></canvas>
+      <canvas id="drawCanvas" style="position:absolute;left:0;top:0;"></canvas>
+    </div>
+
+    <div class="controls">
+      <button id="restartBtn" class="btn secondary">Restart bludiště</button>
+      <button id="showSolution" class="btn">Ukázat start/cíl</button>
+      <div class="status">Čas: <span id="maze-timer">00:00.000</span></div>
+      <div id="maze-result" class="status"></div>
+    </div>
+
+    <p id="maze-note" class="note">Obrázek bludiště uložte do: <code>images/maze.png</code>. Pokud použijete jiný název, změňte proměnnou MAZE_IMG_SRC v kódu níže.</p>
+    <p class="small">Kompatibilita: po úspěchu úkol uloží do localStorage pole completedTasks a collectedChars stejným formátem jako <code>script.js</code> — bez zásahu do <code>script.js</code>.</p>
+  </div>
+
+  <script>
+    // ==== KONFIGURACE (upravit podle potřeby) ====
+    const MAZE_IMG_SRC = 'images/maze.png'; // obrázek bludiště (bílé stěny na černém pozadí)
+    const TASK_NUMBER = 9;                  // číslo úkolu (uloží se do completedTasks)
+    const CHARS_FOR_TASK = '__';            // znak(y) získané za tento úkol
+    const START_COLOR = 'lime';             // barva startového bodu
+    const FINISH_COLOR = 'orange';          // barva cíle
+    const TRAIL_COLOR = '#00ccff';          // barva kreslené stopy
+    const TRAIL_WIDTH = 6;                  // tloušťka kreslené stopy v pixelech (nezávisle na CSS scaling)
+    const COLLISION_THRESHOLD = 200;        // pixel brightness (0-255) nad kterého považujeme pixel za "stěnu"
+    // ============================================
+
+    // interní stavy
+    let baseCanvas, baseCtx, drawCanvas, drawCtx;
+    let mazeImg = new Image();
+    let scale = 1;                // ratio between canvas internal pixels and displayed size
+    let drawing = false;
+    let lastPoint = null;
+    let failed = false;
+    let started = false;
+    let timerInterval = null;
+    let startTime = 0;
+    let elapsedBefore = 0;
+
+    // Start and finish positions (these are relative fractions and will be converted after image loads)
+    // You can fine-tune these to match your maze image.
+    const START_POS = { xFrac: 0.06, yFrac: 0.06, rFrac: 0.03 }; // near top-left
+    const FINISH_POS = { xFrac: 0.86, yFrac: 0.86, rFrac: 0.035 }; // bottom-right
+
+    // Utility: format ms to mm:ss.mmm
+    function formatMs(ms) {
+      const mm = Math.floor(ms / 60000);
+      const ss = Math.floor((ms % 60000) / 1000);
+      const mmm = ms % 1000;
+      return `${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}.${String(mmm).padStart(3,'0')}`;
+    }
+
+    // Load maze image and prepare canvases
+    function initMaze() {
+      baseCanvas = document.getElementById('baseCanvas');
+      drawCanvas = document.getElementById('drawCanvas');
+      baseCtx = baseCanvas.getContext('2d', { willReadFrequently: true });
+      drawCtx = drawCanvas.getContext('2d');
+
+      mazeImg.onload = () => {
+        // set internal canvas size to image natural size for accurate pixel checks
+        baseCanvas.width = mazeImg.naturalWidth;
+        baseCanvas.height = mazeImg.naturalHeight;
+        drawCanvas.width = mazeImg.naturalWidth;
+        drawCanvas.height = mazeImg.naturalHeight;
+
+        // draw base image
+        baseCtx.clearRect(0,0,baseCanvas.width, baseCanvas.height);
+        baseCtx.drawImage(mazeImg, 0, 0);
+
+        // ensure overlay canvas positioned/ sized in DOM to match displayed width
+        syncCanvasDisplaySize();
+
+        // draw start/finish markers (initially visible)
+        drawMarkers(true);
+      };
+
+      mazeImg.onerror = () => {
+        document.getElementById('maze-note').innerHTML = 'Chyba: Nelze načíst obrázek <code>' + MAZE_IMG_SRC + '</code>. Ujistěte se, že soubor existuje v repozitáři.';
+      };
+
+      mazeImg.src = MAZE_IMG_SRC;
+
+      // event handlers for pointer events on overlay canvas
+      ['pointerdown','pointermove','pointerup','pointercancel','pointerout','pointerleave'].forEach(ev => {
+        drawCanvas.addEventListener(ev, handlePointerEvent, { passive:false });
+      });
+
+      // restart button
+      document.getElementById('restartBtn').addEventListener('click', restartMaze);
+      document.getElementById('showSolution').addEventListener('click', () => {
+        drawMarkers(true);
+        setTimeout(() => drawMarkers(false), 2500);
+      });
+
+      // responsive: when window resizes, match display size
+      window.addEventListener('resize', syncCanvasDisplaySize);
+    }
+
+    // adjust displayed CSS size of canvases to maintain responsiveness while keeping internal pixel buffer for collision checks
+    function syncCanvasDisplaySize() {
+      // choose container width
+      const wrapper = document.getElementById('maze-area');
+      const targetWidth = wrapper.clientWidth; // available width
+      // scale factor is display width / internal canvas width
+      const displayWidth = Math.min(targetWidth, baseCanvas.width);
+      scale = displayWidth / baseCanvas.width;
+
+      // apply CSS width to canvases (height auto)
+      baseCanvas.style.width = displayWidth + 'px';
+      baseCanvas.style.height = (baseCanvas.height * scale) + 'px';
+      drawCanvas.style.width = displayWidth + 'px';
+      drawCanvas.style.height = (drawCanvas.height * scale) + 'px';
+
+      // reposition absolute overlay
+      drawCanvas.style.left = '0';
+      drawCanvas.style.top = '0';
+    }
+
+    // draw start/finish markers on overlay (pass show=true to draw, false to clear)
+    function drawMarkers(show) {
+      // markers drawn on drawCtx (overlay)
+      // we redraw overlay entirely (keeping trail) only when show==true; otherwise draw markers semi-transparently then clear after delay
+      // For simplicity: draw markers as filled circles plus labels
+      drawCtx.save();
+      if (show) {
+        // draw translucent background to make markers visible
+        // (we draw on top, not clearing existing trail)
+        const s = getStartCoords();
+        const f = getFinishCoords();
+        drawCtx.beginPath();
+        drawCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        drawCtx.fillStyle = rgba(START_COLOR, 0.9);
+        drawCtx.fill();
+
+        drawCtx.beginPath();
+        drawCtx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+        drawCtx.fillStyle = rgba(FINISH_COLOR, 0.9);
+        drawCtx.fill();
+
+        // labels
+        drawCtx.font = `${Math.max(12, Math.floor(s.r*0.9))}px Arial`;
+        drawCtx.fillStyle = '#000';
+        drawCtx.fillText('START', s.x - s.r/1.6, s.y + 4);
+        drawCtx.fillText('CÍL', f.x - f.r/2, f.y + 4);
+      } else {
+        // nothing (markers are ephemeral)
+      }
+      drawCtx.restore();
+    }
+
+    function rgba(hexOrName, alpha) {
+      // simple mapping for color names used
+      const map = { 'lime':'#00ff00', 'orange':'#ffa500' };
+      const c = map[hexOrName] || hexOrName;
+      return c + Math.floor(alpha*255).toString(16).padStart(2,'0');
+    }
+
+    // convert fractional start/finish to pixel coordinates on internal canvas
+    function getStartCoords() {
+      const w = baseCanvas.width, h = baseCanvas.height;
+      return { x: Math.round(START_POS.xFrac * w), y: Math.round(START_POS.yFrac * h), r: Math.round(START_POS.rFrac * Math.min(w,h)) };
+    }
+    function getFinishCoords() {
+      const w = baseCanvas.width, h = baseCanvas.height;
+      return { x: Math.round(FINISH_POS.xFrac * w), y: Math.round(FINISH_POS.yFrac * h), r: Math.round(FINISH_POS.rFrac * Math.min(w,h)) };
+    }
+
+    // Pointer event handler
+    function handlePointerEvent(e) {
+      e.preventDefault();
+      const rect = drawCanvas.getBoundingClientRect();
+      // convert client coords to internal canvas pixel coords (take scale into account)
+      const x = Math.round((e.clientX - rect.left) / scale);
+      const y = Math.round((e.clientY - rect.top) / scale);
+
+      if (e.type === 'pointerdown') {
+        // only start drawing if pointer is inside START circle and not currently drawing
+        const s = getStartCoords();
+        const ds = distance(x,y,s.x,s.y);
+        if (ds <= s.r) {
+          drawing = true;
+          failed = false;
+          lastPoint = { x,y };
+          // start timer on first actual start
+          if (!started) { startMazeTimer(); started = true; }
+          // draw initial dot
+          drawTrailPoint(x,y);
+        } else {
+          // user clicked outside start; give subtle feedback
+          flashMessage('Začni v oblasti START', 'error');
+        }
+      } else if (e.type === 'pointermove') {
+        if (!drawing || failed) return;
+        if (lastPoint) {
+          // draw line segment from lastPoint to current and check collision along it
+          const collided = checkCollisionAlongLine(lastPoint.x, lastPoint.y, x, y);
+          if (collided) {
+            // collision: clear trail and stop drawing
+            failed = true;
+            drawing = false;
+            lastPoint = null;
+            clearTrail();
+            stopMazeTimer();
+            flashMessage('Dotkl ses stěny — stopa smazána. Zkus to znovu.', 'error');
+            return;
+          } else {
+            // draw segment
+            drawTrailSegment(lastPoint.x, lastPoint.y, x, y);
+            lastPoint = { x,y };
+            // check finish
+            const f = getFinishCoords();
+            if (distance(x,y,f.x,f.y) <= f.r) {
+              // reached finish: success
+              drawing = false;
+              lastPoint = null;
+              stopMazeTimer();
+              onMazeSuccess();
+              return;
+            }
+          }
+        }
+      } else if (e.type === 'pointerup' || e.type === 'pointercancel' || e.type==='pointerleave' || e.type==='pointerout') {
+        drawing = false;
+        lastPoint = null;
+      }
+    }
+
+    // draw a point (small circle) on trail
+    function drawTrailPoint(x,y) {
+      drawCtx.save();
+      drawCtx.beginPath();
+      drawCtx.fillStyle = TRAIL_COLOR;
+      drawCtx.arc(x, y, TRAIL_WIDTH/2, 0, Math.PI*2);
+      drawCtx.fill();
+      drawCtx.restore();
+    }
+
+    // draw line segment on trail (with round caps)
+    function drawTrailSegment(x1,y1,x2,y2) {
+      drawCtx.save();
+      drawCtx.strokeStyle = TRAIL_COLOR;
+      drawCtx.lineWidth = TRAIL_WIDTH;
+      drawCtx.lineCap = 'round';
+      drawCtx.beginPath();
+      drawCtx.moveTo(x1,y1);
+      drawCtx.lineTo(x2,y2);
+      drawCtx.stroke();
+      drawCtx.restore();
+    }
+
+    // clear only the trail (overlay) but keep base maze
+    function clearTrail() {
+      drawCtx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
+      // optionally redraw ephemeral markers
+      drawMarkers(true);
+      // reset timer state (but keep started=false so starting again restarts time)
+      elapsedBefore = 0;
+      started = false;
+      stopMazeTimer();
+      document.getElementById('maze-timer').textContent = formatMs(0);
+    }
+
+    // collision detection along a segment: sample points along line and check baseCanvas pixel brightness
+    function checkCollisionAlongLine(x1,y1,x2,y2) {
+      const dx = x2 - x1, dy = y2 - y1;
+      const dist = Math.hypot(dx,dy);
+      const steps = Math.ceil(dist / 1); // sample every ~1 pixel
+      for (let i=0;i<=steps;i++) {
+        const t = i/steps;
+        const sx = Math.round(x1 + dx * t);
+        const sy = Math.round(y1 + dy * t);
+        if (isWallPixel(sx, sy)) return true;
+      }
+      return false;
+    }
+
+    // is the pixel at (x,y) considered a wall?
+    function isWallPixel(x,y) {
+      if (x < 0 || y < 0 || x >= baseCanvas.width || y >= baseCanvas.height) return true;
+      const imgData = baseCtx.getImageData(x, y, 1, 1).data;
+      const r = imgData[0], g = imgData[1], b = imgData[2];
+      // compute brightness
+      const brightness = 0.299*r + 0.587*g + 0.114*b;
+      // White walls should have high brightness; background is dark.
+      return brightness >= COLLISION_THRESHOLD;
+    }
+
+    // start/stop timer (local to this maze)
+    function startMazeTimer() {
+      startTime = performance.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const now = performance.now();
+        const elapsed = elapsedBefore + (now - startTime);
+        document.getElementById('maze-timer').textContent = formatMs(Math.floor(elapsed));
+      }, 33);
+    }
+    function stopMazeTimer() {
+      if (!timerInterval) return;
+      clearInterval(timerInterval);
+      timerInterval = null;
+      // accumulate elapsedBefore
+      elapsedBefore = elapsedBefore + (performance.now() - startTime);
+    }
+
+    // on success reached finish
+    function onMazeSuccess() {
+      const resultEl = document.getElementById('maze-result');
+      resultEl.textContent = '✔ ' + 'Úspěch! Čas: ' + document.getElementById('maze-timer').textContent;
+      resultEl.className = 'status success';
+      // mark task complete in localStorage (compatible with script.js)
+      const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
+      if (!completed.includes(TASK_NUMBER)) {
+        completed.push(TASK_NUMBER);
+        localStorage.setItem('completedTasks', JSON.stringify(completed));
+      }
+      const collectedChars = JSON.parse(localStorage.getItem('collectedChars') || '{}');
+      collectedChars[TASK_NUMBER] = CHARS_FOR_TASK;
+      localStorage.setItem('collectedChars', JSON.stringify(collectedChars));
+      // update global progress if available
+      if (typeof updateProgress === 'function') {
+        try { updateProgress(); } catch (e) { console.warn('updateProgress failed', e); }
+      }
+      // visually show finish marker
+      drawMarkers(true);
+      // disable further input (optional)
+      disableDrawing();
+    }
+
+    function disableDrawing() {
+      drawCanvas.style.pointerEvents = 'none';
+    }
+    function enableDrawing() {
+      drawCanvas.style.pointerEvents = '';
+    }
+
+    // restart maze: clear trail and timer; do not affect other localStorage items except completedTasks if you want (we won't clear completedTasks)
+    function restartMaze() {
+      // clear overlay
+      drawCtx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
+      // reset internal state
+      drawing = false;
+      failed = false;
+      lastPoint = null;
+      // reset timer
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      started = false;
+      startTime = 0;
+      elapsedBefore = 0;
+      document.getElementById('maze-timer').textContent = formatMs(0);
+      document.getElementById('maze-result').textContent = '';
+      document.getElementById('maze-result').className = 'status';
+      // redraw ephemeral markers
+      drawMarkers(true);
+      // re-enable input
+      enableDrawing();
+    }
+
+    // small helper: compute distance
+    function distance(x1,y1,x2,y2) { return Math.hypot(x1-x2, y1-y2); }
+
+    // small UI flash message
+    let flashTimer = null;
+    function flashMessage(msg, type) {
+      const el = document.getElementById('maze-result');
+      el.textContent = msg;
+      el.className = 'status ' + (type === 'error' ? 'error' : 'success');
+      if (flashTimer) clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => {
+        el.textContent = '';
+        el.className = 'status';
+      }, 2000);
+    }
+
+    // Initialization on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initMaze();
+    });
+  </script>
+</body>
+</html>
