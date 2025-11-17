@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Úkol 2 — Sametová šifra</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+
+  <style>
+    /* Simple styles for the inserted image and feedback */
+    .task-figure {
+      margin: 14px 0;
+      text-align: center;
+    }
+    .task-image {
+      max-width: 100%;
+      height: auto;
+      display: inline-block;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    .task-caption {
+      font-size: 0.95rem;
+      color: #666;
+      margin-top: 6px;
+    }
+    #feedback {
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    #feedback.correct { color: #0a0; }
+    #feedback.wrong   { color: #c00; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Úkol 2</h2>
+
+    <!-- Put the image for the task here.
+         - Place the image file in the repository at: images/ukol2.png
+         - Or change src to an external URL (e.g. src="https://example.com/image.png")
+    -->
+    <figure class="task-figure" aria-hidden="false">
+      <img src="images/ukol2.png" alt="Úkol 2 — šifra (ilustrační obrázek)" class="task-image" loading="lazy">
+      <figcaption class="task-caption">Nápověda a šifra (umístěte sem obrázek souboru images/ukol2.png nebo změňte src).</figcaption>
+    </figure>
+
+    <p><!-- Sem vlož zadání úkolu týkající se Sametové revoluce. --></p>
+    <p class="note">Tip pro pořadatele: vložte sem krátký text, otázku nebo šifru. Hráči naskenují QR a zadávají odpověď sem.</p>
+
+    <!-- Input for player's answer -->
+    <input type="text" id="answer" placeholder="Zadejte odpověď">
+
+    <div style="margin-top:10px;">
+      <!-- The button calls checkAnswer with the constant CORRECT_ANSWER (change that constant below to set the solution) -->
+      <button onclick="checkAnswer(CORRECT_ANSWER, 'ukol3.html')">Odeslat</button>
+    </div>
+
+    <p id="feedback" role="status" aria-live="polite"></p>
+
+    <div class="footer">Správná odpověď (dočasná): <strong id="answer-reveal">********</strong></div>
+  </div>
+
+  <script>
+    // <-- Put the solution on the single line below (replace the string).
+    // Example: const CORRECT_ANSWER = 'MOJE_ODPOVED';
+    // Keep it exactly as you want it to be compared (this code trims and compares case-insensitively).
+    const CORRECT_ANSWER = 'ANSWER2';
+
+    // The script will show the answer in the footer only if you want (comment out the next line to hide it).
+    // document.getElementById('answer-reveal').textContent = CORRECT_ANSWER; // <-- uncomment to reveal
+
+    /**
+     * checkAnswer(correct, next)
+     * - correct: the correct solution string (we pass CORRECT_ANSWER)
+     * - next: optional next page to go to when answer is correct
+     *
+     * Behavior:
+     * - reads the value of #answer
+     * - compares trimmed, case-insensitive
+     * - shows feedback (green/red)
+     * - if correct, redirects to next after a short delay
+     */
+    function checkAnswer(correct, next) {
+      const input = document.getElementById('answer');
+      const feedback = document.getElementById('feedback');
+      const user = (input.value || '').trim();
+
+      // Normalize for case-insensitive compare; change if you need case-sensitive compare
+      if (user.toLowerCase() === String(correct).trim().toLowerCase()) {
+        feedback.textContent = 'Správně — pokračuji dál...';
+        feedback.classList.remove('wrong');
+        feedback.classList.add('correct');
+
+        // short delay so the player can see the message, then go to next page if provided
+        if (next) {
+          setTimeout(() => { window.location.href = next; }, 1200);
+        }
+      } else {
+        feedback.textContent = 'Špatně — zkuste to znovu.';
+        feedback.classList.remove('correct');
+        feedback.classList.add('wrong');
+      }
+    }
+
+    // Optional: allow pressing Enter in the input to trigger submit
+    document.getElementById('answer').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        checkAnswer(CORRECT_ANSWER, 'ukol3.html');
+      }
+    });
+  </script>
+</body>
+</html>
