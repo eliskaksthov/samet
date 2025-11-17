@@ -105,7 +105,7 @@
       // zrušit po krátké době
       setTimeout(() => {
         if (el.parentNode) el.parentNode.removeChild(el);
-      }, 100);
+      }, 89);
       // zkontrolovat vítězství
       if (next >= TARGET_COUNT) {
         finishSuccess();
