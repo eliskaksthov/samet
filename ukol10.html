@@ -8,25 +8,67 @@
   <script src="script.js" defer></script>
   <script src="keygame.js" defer></script>
   <style>
-    /* Místní styl pro hru; lze přesunout do style.css */
-    .container {
-      max-width: 800px;
-      margin: 24px auto;
-      padding: 16px;
-      background: #00;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    :root {
+      --red: #d70c0f;
+      --blue: #004f9e;
+      --white: #ffffff;
+      --black: #000000;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--blue);
+      border-radius: 10px;
+      padding: 30px;
+      border: 3px solid var(--white);
+      max-width: 900px;
+      width: 100%;
+      margin: 20px;
+    }
+
+    h1, h2 {
+      font-family: 'Anton', sans-serif;
+      text-align: center;
+      color: var(--white);
+      margin-bottom: 20px;
+      font-size: 2em;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin-bottom: 20px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
     .game-area {
       position: relative;
       width: 100%;
-      height: 320px;
-      border: 2px dashed #00;
+      height: 400px;
+      border: 2px solid var(--white);
       border-radius: 8px;
       overflow: hidden;
-      background: linear-gradient(180deg,#fafafa,#f0f0f0);
-      margin-top: 12px;
+      background: var(--black);
+      margin: 20px 0;
     }
+
     .key-sprite {
       position: absolute;
       width: 48px;
@@ -36,29 +78,99 @@
       transition: transform 0.08s linear;
       will-change: transform, opacity;
       pointer-events: auto;
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
     }
+
     .hud {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-top:12px;
-      flex-wrap:wrap;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
     }
+
     .hud .panel {
-      padding:8px 12px;
-      background:#00;
-      border-radius:6px;
-      border:1px solid #e2e2e2;
-      font-weight:600;
+      padding: 10px 20px;
+      background: var(--black);
+      border-radius: 6px;
+      border: 1px solid var(--white);
+      font-weight: 600;
+      color: var(--white);
+      min-width: 200px;
+      text-align: center;
     }
-    .controls { margin-top:12px; }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      background: var(--white);
+      color: var(--black);
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      background: var(--red);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    #kg-start {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    #kg-restart {
+      background: var(--blue);
+      color: var(--white);
+      border: 1px solid var(--white);
+    }
+
+    #kg-reset-storage {
+      background: var(--red);
+      color: var(--white);
+    }
+
     .result {
-      margin-top:12px;
-      font-size:1.05rem;
-      font-weight:700;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--white);
+      min-height: 24px;
     }
-    .hidden { display:none; }
-    button { cursor:pointer; padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#00; }
+
+    .hidden { 
+      display: none; 
+    }
+
+    .note {
+      color: #aaa;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      color: #aaa;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
