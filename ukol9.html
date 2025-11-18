@@ -343,7 +343,7 @@
     // on success reached finish
     function onMazeSuccess() {
       const resultEl = document.getElementById('maze-result');
-      resultEl.textContent = '✔ ' + 'Úspěch! Čas: ' + document.getElementById('maze-timer').textContent;
+      resultEl.textContent = Získáváš písmeno O Čas: ' + document.getElementById('maze-timer').textContent;
       resultEl.className = 'status success';
       // mark task complete in localStorage (compatible with script.js)
       const completed = JSON.parse(localStorage.getItem('completedTasks') || '[]');
