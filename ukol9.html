@@ -8,22 +8,127 @@
   <script src="script.js" defer></script>
 
   <style>
-    .container { max-width:900px; margin:18px auto; padding:12px; }
-    h2 { margin-bottom:6px; }
-    .maze-wrap { position:relative; display:inline-block; background:#000; border:1px solid #333; }
-    canvas { display:block; touch-action: none; } /* disable default touch gestures */
-    .controls { margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .btn { padding:8px 12px; border-radius:6px; border:1px solid #1976d2; cursor:pointer; background:#1976d2; color:#fff; }
-    .btn.secondary { background:#fff; color:#1976d2; border:1px solid #1976d2; }
-    .status { margin-left:10px; font-weight:700; }
-    #maze-timer { font-family:monospace; }
-    .note { margin-top:10px; color:#444; }
-    .success { color:#0a0; }
-    .error { color:#c00; }
-    .small { font-size:0.9rem; color:#666; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --red: #d70c0f;
+      --blue: #004f9e;
+      --white: #ffffff;
+      --black: #000000;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--white);
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+
+    .maze-wrap { 
+      position: relative; 
+      display: inline-block; 
+      background: var(--black); 
+      border: 1px solid var(--white);
+      margin: 20px 0;
+    }
+    
+    canvas { 
+      display: block; 
+      touch-action: none; 
+    }
+    
+    .controls { 
+      margin: 15px 0; 
+      display: flex; 
+      gap: 15px; 
+      justify-content: center;
+      align-items: center; 
+      flex-wrap: wrap; 
+    }
+    
+    .btn { 
+      padding: 10px 20px; 
+      border-radius: 6px; 
+      border: none;
+      cursor: pointer; 
+      background: var(--blue); 
+      color: var(--white);
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .btn.secondary { 
+      background: transparent; 
+      color: var(--white); 
+      border: 1px solid var(--white);
+    }
+    
+    .status { 
+      margin-left: 15px; 
+      font-weight: 700;
+      color: var(--white);
+    }
+    
+    #maze-timer { 
+      font-family: monospace;
+      color: var(--white);
+      font-size: 1.2rem;
+    }
+    
+    .note { 
+      margin: 15px 0;
+      color: #aaa;
+    }
+    
+    .success { 
+      color: #4caf50;
+    }
+    
+    .error { 
+      color: #f44336;
+    }
+    
+    .small { 
+      font-size: 0.9rem; 
+      color: #aaa; 
+    }
+    
     /* make canvas responsive but maintain pixel collision by scaling drawing coordinates */
-    .maze-wrap.responsive { width:100%; max-width:740px; }
-    .maze-wrap.responsive canvas { width:100%; height:auto; }
+    .maze-wrap.responsive { 
+      width: 100%; 
+      max-width: 740px; 
+      margin: 0 auto;
+    }
+    
+    .maze-wrap.responsive canvas { 
+      width: 100%; 
+      height: auto; 
+    }
   </style>
 </head>
 <body>
