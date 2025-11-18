@@ -5,8 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Najdi 5 rozdílů - Sametová šifra</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
     <style>
+        /* CSS VSTAVĚNÝ Z PŮVODNÍHO KÓDU */
+        /* Zde je kompletní styl, včetně CSS proměnných (pokud jsou definovány v style.css, jinak je nutné je sem přidat) */
+        
+        /* Předpokládáme základní proměnné, které v HTML chyběly. Přidáme je sem do :root pro funkčnost */
+        :root {
+            --blue: #3498db;
+            --white: #ecf0f1;
+            --black: #2c3e50;
+            --red: #e74c3c;
+        }
+
         /* Game specific styles */
         .game-container {
             background: var(--blue);
@@ -22,7 +32,9 @@
         }
 
         .game-header h1 {
-            font-family: 'Anton', sans-serif;
+            /* Předpokládáme font 'Anton' pro stylování */
+            /* font-family: 'Anton', sans-serif; */
+            font-family: sans-serif; 
             color: var(--white);
             font-size: 2.5rem;
             letter-spacing: 2px;
@@ -67,6 +79,8 @@
             border: 3px solid var(--white);
             border-radius: 10px;
             overflow: hidden;
+            /* Přidáno pro lepší klikání */
+            cursor: pointer; 
         }
 
         .image-wrapper img {
@@ -82,7 +96,8 @@
             pointer-events: none;
             transform: translate(-50%, -50%);
             animation: pulse 0.5s ease-out;
-            background: rgba(255, 0, 0, 0.1);
+            background: rgba(255, 0, 0, 0.3); /* Zvýšena průhlednost pro viditelnost */
+            z-index: 10;
         }
 
         @keyframes pulse {
@@ -204,116 +219,16 @@
     </div>
 
     <script>
-        // Game variables
-        let differencesFound = 0;
-        let startTime;
-        let timerInterval;
-        const totalDifferences = 5;
-        const differenceCoordinates = [
-            { x: 0.75, y: 0.25, radius: 0.05 },  // Adjust these coordinates based on your images
-            { x: 0.25, y: 0.5, radius: 0.05 },
-            { x: 0.6, y: 0.6, radius: 0.05 },
-            { x: 0.4, y: 0.3, radius: 0.05 },
-            { x: 0.8, y: 0.8, radius: 0.05 }
-        ];
-        const foundDifferences = new Array(totalDifferences).fill(false);
-
-        // Start the game
-        function startGame() {
-            resetGame();
-            startTimer();
-        }
-
-        // Start the timer
-        function startTimer() {
-            startTime = new Date();
-            timerInterval = setInterval(updateTimer, 1000);
-        }
-
-        // Update the timer display
-        function updateTimer() {
-            const currentTime = new Date();
-            const elapsed = Math.floor((currentTime - startTime) / 1000);
-            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
-            const seconds = (elapsed % 60).toString().padStart(2, '0');
-            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
-        }
-
-        // Check if the click was on a difference
-        function checkDifference(clickX, clickY, imgElement) {
-            const rect = imgElement.getBoundingClientRect();
-            const x = (clickX - rect.left) / rect.width;
-            const y = (clickY - rect.top) / rect.height;
-
-            for (let i = 0; i < differenceCoordinates.length; i++) {
-                if (foundDifferences[i]) continue;
-
-                const diff = differenceCoordinates[i];
-                const distance = Math.sqrt(Math.pow(x - diff.x, 2) + Math.pow(y - diff.y, 2));
-                
-                if (distance < diff.radius) {
-                    foundDifferences[i] = true;
-                    markDifference(diff.x * 100, diff.y * 100, diff.radius * 100);
-                    differencesFound++;
-                    updateCounter();
-                    
-                    if (differencesFound === totalDifferences) {
-                        endGame();
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // Mark a found difference
-        function markDifference(x, y, radius) {
-            const marker = document.createElement('div');
-            marker.className = 'marker';
-            marker.style.width = `${radius * 2}%`;
-            marker.style.height = `${radius * 2}%`;
-            marker.style.left = `${x}%`;
-            marker.style.top = `${y}%`;
-            
-            // Add to both images
-            document.getElementById('image1-wrapper').appendChild(marker.cloneNode());
-            document.getElementById('image2-wrapper').appendChild(marker);
-        }
-
-        // Update the counter
-        function updateCounter() {
-            document.getElementById('counter').textContent = `${differencesFound}/${totalDifferences}`;
-        }
-
-        // End the game
-        function endGame() {
-            clearInterval(timerInterval);
-            document.getElementById('congratulations').classList.add('show');
-        }
-
-        // Reset the game
-        function resetGame() {
-            clearInterval(timerInterval);
-            differencesFound = 0;
-            foundDifferences.fill(false);
-            document.getElementById('counter').textContent = '0/5';
-            document.getElementById('timer').textContent = '00:00';
-            document.getElementById('congratulations').classList.remove('show');
-            
-            // Remove all markers
-            document.querySelectorAll('.marker').forEach(marker => marker.remove());
-            
-            // Restart the game
-            startGame();
-        }
-
-        // Game state
+        // Game variables - Sjednocená verze
+        
+        // Relativní souřadnice (0.0 až 1.0) a relativní poloměr (radius)
+        // DŮLEŽITÉ: Tyto souřadnice MUSÍ odpovídat skutečným rozdílům na vašich obrázcích!
         const differences = [
-            { x: 0.25, y: 0.3, radius: 30, found: false },
-            { x: 0.6, y: 0.45, radius: 25, found: false },
-            { x: 0.4, y: 0.7, radius: 20, found: false },
-            { x: 0.75, y: 0.2, radius: 25, found: false },
-            { x: 0.15, y: 0.6, radius: 20, found: false }
+            { x: 0.25, y: 0.3, radius: 0.05, found: false },
+            { x: 0.6, y: 0.45, radius: 0.04, found: false },
+            { x: 0.4, y: 0.7, radius: 0.03, found: false },
+            { x: 0.75, y: 0.2, radius: 0.04, found: false },
+            { x: 0.15, y: 0.6, radius: 0.035, found: false }
         ];
 
         let foundCount = 0;
@@ -321,57 +236,70 @@
         let startTime = 0;
         let timerInterval = null;
 
-        // Start the game when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            startGame();
-            
-            // Add event listener for reset button
-            document.getElementById('resetBtn').addEventListener('click', resetGame);
-        });
-
-        // Start the game
+        /**
+         * Inicializuje a spouští hru.
+         */
         function startGame() {
             gameStarted = true;
             foundCount = 0;
+            differences.forEach(diff => diff.found = false); // Reset stavů
             updateCounter();
             startTimer();
+            document.getElementById('congratulations').classList.remove('show');
+            document.querySelectorAll('.marker').forEach(marker => marker.remove());
         }
 
-        // Start the timer
+        /**
+         * Spouští časovač.
+         */
         function startTimer() {
             startTime = Date.now();
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
         }
 
-        // Update the timer display
+        /**
+         * Aktualizuje zobrazení časovače.
+         */
         function updateTimer() {
+            if (!gameStarted) return;
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
             const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
             const seconds = (elapsed % 60).toString().padStart(2, '0');
             document.getElementById('timer').textContent = `${minutes}:${seconds}`;
         }
 
-        // Check if the click was on a difference
+        /**
+         * Kontroluje, zda kliknutí zasáhlo rozdíl.
+         * @param {number} clickX - X souřadnice kliknutí (v pixelech) uvnitř obrázku.
+         * @param {number} clickY - Y souřadnice kliknutí (v pixelech) uvnitř obrázku.
+         * @param {HTMLElement} imgElement - Element obrázku.
+         */
         function checkDifference(clickX, clickY, imgElement) {
             if (!gameStarted) return;
             
             const imgRect = imgElement.getBoundingClientRect();
-            const x = (clickX / imgRect.width);
-            const y = (clickY / imgRect.height);
+            // Přepočet na relativní souřadnice (0.0 - 1.0)
+            const x = clickX / imgRect.width;
+            const y = clickY / imgRect.height;
 
             for (let i = 0; i < differences.length; i++) {
                 const diff = differences[i];
                 if (diff.found) continue;
 
+                // Výpočet vzdálenosti v relativních jednotkách
                 const dx = x - diff.x;
                 const dy = y - diff.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance * imgRect.width < diff.radius) {
+                // Kontrola, zda vzdálenost je menší než relativní poloměr
+                if (distance < diff.radius) {
                     diff.found = true;
                     foundCount++;
-                    markDifference(diff.x * imgRect.width, diff.y * imgRect.height, diff.radius, imgElement);
+                    
+                    // Označení rozdílu na obou obrázcích
+                    markDifference(diff.x * imgRect.width, diff.y * imgRect.height, diff.radius * imgRect.width, imgElement);
+                    
                     updateCounter();
                     
                     if (foundCount === differences.length) {
@@ -382,39 +310,46 @@
             }
         }
 
-        // Mark a found difference
+        /**
+         * Vytvoří a zobrazí značku na nalezeném rozdílu.
+         * @param {number} x - Absolutní X pozice v pixelech.
+         * @param {number} y - Absolutní Y pozice v pixelech.
+         * @param {number} radius - Poloměr značky v pixelech.
+         * @param {HTMLElement} imgElement - Kliknutý element obrázku.
+         */
         function markDifference(x, y, radius, imgElement) {
-            const marker = document.createElement('div');
-            marker.className = 'marker';
-            marker.style.width = `${radius * 2}px`;
-            marker.style.height = `${radius * 2}px`;
-            marker.style.left = `${x}px`;
-            marker.style.top = `${y}px`;
-            
             const wrapper = imgElement.closest('.image-wrapper');
-            wrapper.appendChild(marker);
             
-            // Add marker to the other image as well
-            const otherWrapper = wrapper.id === 'image1-wrapper' ? 
-                document.getElementById('image2-wrapper') : 
-                document.getElementById('image1-wrapper');
-                
-            const otherMarker = marker.cloneNode(true);
-            otherWrapper.appendChild(otherMarker);
+            // Marker pro první obrázek
+            const marker1 = document.createElement('div');
+            marker1.className = 'marker';
+            marker1.style.width = `${radius * 2}px`;
+            marker1.style.height = `${radius * 2}px`;
+            marker1.style.left = `${x}px`;
+            marker1.style.top = `${y}px`;
+            document.getElementById('image1-wrapper').appendChild(marker1);
+
+            // Marker pro druhý obrázek (klonování je nejjednodušší)
+            const marker2 = marker1.cloneNode(true);
+            document.getElementById('image2-wrapper').appendChild(marker2);
         }
 
-        // Update the counter
+        /**
+         * Aktualizuje počítadlo nalezených rozdílů.
+         */
         function updateCounter() {
             document.getElementById('counter').textContent = `${foundCount}/${differences.length}`;
         }
 
-        // End the game
+        /**
+         * Ukončuje hru (zastaví časovač, zobrazí gratulaci).
+         */
         function endGame() {
             gameStarted = false;
             clearInterval(timerInterval);
             document.getElementById('congratulations').classList.add('show');
             
-            // Save completion to localStorage
+            // Uložení stavu do localStorage (volitelná funkce)
             if (typeof Storage !== 'undefined') {
                 const completedTasks = JSON.parse(localStorage.getItem('completedTasks') || '[]');
                 if (!completedTasks.includes('ukol6')) {
@@ -424,43 +359,39 @@
             }
         }
 
-        // Reset the game
+        /**
+         * Resetuje celou hru.
+         */
         function resetGame() {
-            // Clear markers
-            document.querySelectorAll('.marker').forEach(marker => marker.remove());
-            
-            // Reset differences
-            differences.forEach(diff => diff.found = false);
-            
-            // Reset UI
-            foundCount = 0;
-            updateCounter();
-            document.getElementById('congratulations').classList.remove('show');
-            
-            // Restart the game
-            startGame();
+            // Zajišťuje kompletní reset voláním startGame, které resetuje i proměnné
+            startGame(); 
         }
 
-        // Event listeners for clicking on images
-        document.getElementById('image1').addEventListener('click', (e) => {
-            const rect = e.target.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            checkDifference(clickX, clickY, e.target);
+        // ------------------------------------------------------------------
+        // EVENT LISTENERY
+        // ------------------------------------------------------------------
+
+        // Spuštění hry po načtení veškerého obsahu
+        document.addEventListener('DOMContentLoaded', () => {
+            // Přidání listenerů na kliknutí na obrázky
+            const image1 = document.getElementById('image1');
+            const image2 = document.getElementById('image2');
+            
+            // Používáme event.offsetX/offsetY pro souřadnice PŘÍMO uvnitř obrázku (nejjednodušší)
+            image1.addEventListener('click', (e) => {
+                checkDifference(e.offsetX, e.offsetY, e.target);
+            });
+
+            image2.addEventListener('click', (e) => {
+                checkDifference(e.offsetX, e.offsetY, e.target);
+            });
+            
+            // Listener pro tlačítko reset
+            document.getElementById('resetBtn').addEventListener('click', resetGame);
+            
+            // Spustí hru po načtení (nečeká na obrázky, ale je připravena)
+            startGame();
         });
-
-        document.getElementById('image2').addEventListener('click', (e) => {
-            const rect = e.target.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            checkDifference(clickX, clickY, e.target);
-        });
-
-        // Reset button
-        document.getElementById('resetBtn').addEventListener('click', resetGame);
-
-        // Start the game when the page loads
-        window.addEventListener('load', startGame);
     </script>
 </body>
 </html>
